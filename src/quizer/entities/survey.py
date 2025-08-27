@@ -1,6 +1,7 @@
 from uuid import UUID
 from dataclasses import dataclass
 
+
 @dataclass
 class Question:
     id: UUID
@@ -14,5 +15,3 @@ class Survey:
     name: str
     author: UUID
     questions: list[UUID]
-
-    
