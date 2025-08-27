@@ -4,7 +4,9 @@ from factories import make_survey
 
 from quizer.application.interfaces.repositories.survey import SurveyRepository
 from quizer.application.dto.mappers.survey import to_survey_dto
-from quizer.application.interactors.survey.get_all import GetAllSurveysInteractor
+from quizer.application.interactors.survey.get_all_surveys import (
+    GetAllSurveysInteractor,
+)
 
 
 async def test_recieving_all_surveys():

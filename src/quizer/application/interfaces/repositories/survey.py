@@ -8,6 +8,13 @@ from quizer.entities.survey import Survey
 
 class SurveyRepository(Protocol):
     @abstractmethod
+    async def get_by_id(
+        self,
+        id: UUID,
+    ) -> Survey:
+        raise NotImplementedError
+
+    @abstractmethod
     async def get_all(
         self,
     ) -> list[Survey]:
@@ -18,4 +25,11 @@ class SurveyRepository(Protocol):
         self,
         survey: Survey,
     ) -> UUID:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def delete(
+        self,
+        id: UUID,
+    ) -> None:
         raise NotImplementedError
