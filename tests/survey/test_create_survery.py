@@ -4,7 +4,7 @@ from unittest.mock import create_autospec
 
 from factories import make_survey
 
-from quizer.application.interactors.user.create_survey import CreateSurveryInteractor
+from quizer.application.interactors.survey.create_survey import CreateSurveryInteractor
 from quizer.application.interfaces.common.id_provider import IdProvider
 from quizer.application.interfaces.repositories.survey import SurveyRepository
 from quizer.application.interfaces.factories.survey import SurveyFactory
