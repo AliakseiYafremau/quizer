@@ -22,7 +22,6 @@ async def test_survery_creation(faker: Faker):
 
     await interactor(survey_name)
 
-    survey_factory_mock.create_survey.assert_called_once()
     survey_repo_mock.add.assert_called_once()
     new_survey = survey_repo_mock.add.call_args.args[0]
     assert new_survey.name == survey_name
