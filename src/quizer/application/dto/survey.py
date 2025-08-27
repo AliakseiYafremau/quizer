@@ -6,4 +6,10 @@ from dataclasses import dataclass
 class ReadSurveyDTO:
     id: UUID
     name: str
-    author: UUID
+    author: str
+
+
+@dataclass
+class UpdateSurveyDTO:
+    id: UUID
+    new_name: str

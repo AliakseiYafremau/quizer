@@ -13,3 +13,10 @@ class TelegramIdProvider(BaseProvider):
 
     def telegram_id(self) -> str:
         return generate_telegram_id(self.fake)
+
+
+def get_faker(*providers: tuple[BaseProvider]):
+    faker = Faker()
+    for provider in providers:
+        faker.add_provider(provider)
+    return faker

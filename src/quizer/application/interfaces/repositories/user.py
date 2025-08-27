@@ -15,10 +15,3 @@ class UserRepository(Protocol):
         user: User,
     ) -> str:
         raise NotImplementedError
-
-    @abstractmethod
-    async def update(
-        self,
-        user: User,
-    ) -> None:
-        raise NotImplementedError

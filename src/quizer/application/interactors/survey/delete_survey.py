@@ -11,5 +11,5 @@ class DeleteSurveyInteractor:
     async def __call__(self, survey_id: UUID) -> None:
         user_id = self._id_provider.get_current_user_id()
         survey = await self._survey_repo.get_by_id(survey_id)
-        survey.can_delete(user_id)
+        survey.can_manage(user_id)
         await self._survey_repo.delete(survey_id)

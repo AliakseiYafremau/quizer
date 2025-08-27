@@ -28,6 +28,13 @@ class SurveyRepository(Protocol):
         raise NotImplementedError
 
     @abstractmethod
+    async def update(
+        self,
+        survey: Survey,
+    ) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
     async def delete(
         self,
         id: UUID,
