@@ -2,7 +2,7 @@ from faker import Faker
 
 from unittest.mock import create_autospec
 
-from factories import make_survey
+from tests.factories import make_survey
 
 from quizer.application.interactors.survey.create_survey import CreateSurveryInteractor
 from quizer.application.interfaces.common.id_provider import IdProvider

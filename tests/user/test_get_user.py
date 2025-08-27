@@ -2,7 +2,7 @@ from faker import Faker
 
 from unittest.mock import create_autospec
 
-from factories import make_user
+from tests.factories import make_user
 
 from quizer.application.dto.mappers.user import to_user_dto
 

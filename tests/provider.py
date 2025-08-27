@@ -15,7 +15,7 @@ class TelegramIdProvider(BaseProvider):
         return generate_telegram_id(self.fake)
 
 
-def get_faker(*providers: tuple[BaseProvider]):
+def get_faker(*providers: type[BaseProvider]):
     faker = Faker()
     for provider in providers:
         faker.add_provider(provider)

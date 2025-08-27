@@ -1,6 +1,6 @@
 from unittest.mock import create_autospec
 
-from factories import make_survey
+from tests.factories import make_survey
 
 from quizer.application.interfaces.repositories.survey import SurveyRepository
 from quizer.application.dto.mappers.survey import to_survey_dto

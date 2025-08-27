@@ -1,7 +1,7 @@
 import pytest
 from faker import Faker
 
-from provider import TelegramIdProvider, get_faker
+from tests.provider import TelegramIdProvider, get_faker
 
 
 @pytest.fixture

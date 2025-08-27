@@ -3,7 +3,7 @@ from uuid import uuid4
 
 from unittest.mock import create_autospec
 
-from factories import make_survey
+from tests.factories import make_survey
 
 from quizer.application.dto.survey import UpdateSurveyDTO
 from quizer.application.interactors.survey.update_survey import UpdateSurveyInteractor

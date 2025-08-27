@@ -1,7 +1,6 @@
 from uuid import UUID, uuid4
-from faker import Faker
 
-from provider import generate_telegram_id, get_faker, TelegramIdProvider
+from tests.provider import generate_telegram_id, get_faker, TelegramIdProvider
 
 from quizer.entities.user import User
 from quizer.entities.survey import Survey, Question
