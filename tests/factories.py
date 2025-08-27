@@ -1,14 +1,17 @@
 from uuid import UUID, uuid4
 from faker import Faker
+
+from provider import generate_telegram_id
+
 from quizer.entities.user import User
 from quizer.entities.survey import Survey, Question
 
 faker = Faker()
 
 
-def make_user(id: UUID | None = None, name: str | None = None) -> User:
+def make_user(id: str | None = None, name: str | None = None) -> User:
     return User(
-        id=id or uuid4(),
+        id=id or generate_telegram_id(faker),
         name=name or faker.name(),
     )
 

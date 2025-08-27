@@ -2,6 +2,6 @@ from dataclasses import dataclass
 
 
 @dataclass
-class User:
+class UserDTO:
     id: str
     name: str
