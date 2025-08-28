@@ -11,7 +11,7 @@ class SurveyRepository(Protocol):
     async def get_by_id(
         self,
         id: UUID,
-    ) -> Survey:
+    ) -> Survey | None:
         raise NotImplementedError
 
     @abstractmethod
