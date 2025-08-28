@@ -7,7 +7,7 @@ from tests.factories import make_survey
 from quizer.application.interactors.survey.create_survey import CreateSurveryInteractor
 from quizer.application.interfaces.common.id_provider import IdProvider
 from quizer.application.interfaces.repositories.survey import SurveyRepository
-from quizer.application.interfaces.factories.survey import SurveyFactory
+from quizer.application.factories.survey import SurveyFactory
 
 
 async def test_survery_creation(faker: Faker):

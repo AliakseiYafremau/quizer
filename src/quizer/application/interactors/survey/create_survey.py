@@ -2,7 +2,7 @@ from uuid import UUID
 
 from quizer.application.interfaces.common.id_provider import IdProvider
 from quizer.application.interfaces.repositories.survey import SurveyRepository
-from quizer.application.interfaces.factories.survey import SurveyFactory
+from quizer.application.factories.survey import SurveyFactory
 
 
 class CreateSurveryInteractor:
