@@ -42,12 +42,12 @@ def make_survey(
 def make_answer(
     id: UUID | None = None,
     user: str | None = None,
-    question: UUID | None = None,
-    option: int | None = None,
+    survey: UUID | None = None,
+    selections: dict[UUID, int] | None = None,
 ) -> Answer:
     return Answer(
         id=id or uuid4(),
         user=user or generate_telegram_id(faker),
-        question=question or uuid4(),
-        option=option or faker.random_int(min=0, max=2),
+        survey=survey or uuid4(),
+        selections=selections or {},
     )

@@ -8,8 +8,8 @@ from quizer.entities.survey import Answer
 
 class AnswerRepository(Protocol):
     @abstractmethod
-    async def get_by_user_and_question_id(
-        self, user_id: str, question_id: UUID
+    async def get_by_user_and_survey_id(
+        self, user_id: str, survey_id: UUID
     ) -> Answer | None:
         raise NotImplementedError
 

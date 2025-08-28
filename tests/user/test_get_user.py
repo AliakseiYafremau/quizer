@@ -12,13 +12,19 @@ from quizer.application.interactors.user.get_user import GetUserInteractor
 
 
 async def test_user_recieving(faker: Faker):
+    # Arrange
     user = make_user()
     user_dto = to_user_dto(user)
+
     id_provider_stub = create_autospec(IdProvider)
     user_repo_stub = create_autospec(UserRepository)
+
     user_repo_stub.get_by_id.return_value = user
+
     interactor = GetUserInteractor(id_provider_stub, user_repo_stub)
 
+    # Act
     result = await interactor()
 
+    # Assert
     assert result == user_dto

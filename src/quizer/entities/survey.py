@@ -8,8 +8,8 @@ from quizer.entities.exceptions import AccessDeniedError
 class Answer:
     id: UUID
     user: str
-    question: UUID
-    option: int
+    survey: UUID
+    selections: dict[UUID, int]
 
 
 @dataclass

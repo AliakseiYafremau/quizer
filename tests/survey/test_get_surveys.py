@@ -10,12 +10,17 @@ from quizer.application.interactors.survey.get_all_surveys import (
 
 
 async def test_recieving_all_surveys():
+    # Arrange
     surveys = [make_survey() for _ in range(3)]
     surveys_dto = list(map(to_survey_dto, surveys))
+
     survey_repo_stub = create_autospec(SurveyRepository)
     survey_repo_stub.get_all.return_value = surveys
+
     interactor = GetAllSurveysInteractor(survey_repo_stub)
 
+    # Act
     result = await interactor()
 
+    # Assert
     assert result == surveys_dto

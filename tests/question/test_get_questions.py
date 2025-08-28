@@ -13,14 +13,19 @@ from quizer.application.interactors.question.get_survey_questions import (
 
 
 async def test_recieving_all_questions():
+    # Arrange
     question_ids = [uuid4() for _ in range(3)]
     questions = [make_question(id=question_id) for question_id in question_ids]
     survey = make_survey(questions=question_ids)
     questions_dto = list(map(to_question_dto, questions))
+
     question_repo_stub = create_autospec(QuestionRepository)
     question_repo_stub.get_by_survey_id.return_value = questions
+
     interactor = GetSurveyQuestionsInteractor(question_repo_stub)
 
+    # Act
     result = await interactor(survey.id)
 
+    # Assert
     assert result == questions_dto
