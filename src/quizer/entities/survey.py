@@ -5,6 +5,14 @@ from quizer.entities.exceptions import AccessDeniedError
 
 
 @dataclass
+class Answer:
+    id: UUID
+    user: str
+    question: UUID
+    option: int
+
+
+@dataclass
 class Question:
     id: UUID
     name: str

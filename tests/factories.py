@@ -3,7 +3,7 @@ from uuid import UUID, uuid4
 from tests.provider import generate_telegram_id, get_faker, TelegramIdProvider
 
 from quizer.entities.user import User
-from quizer.entities.survey import Survey, Question
+from quizer.entities.survey import Survey, Question, Answer
 
 faker = get_faker(TelegramIdProvider)
 
@@ -36,4 +36,18 @@ def make_survey(
         name=name or faker.sentence(),
         author=author or faker.telegram_id(),
         questions=questions or [uuid4() for _ in range(5)],
+    )
+
+
+def make_answer(
+    id: UUID | None = None,
+    user: str | None = None,
+    question: UUID | None = None,
+    option: int | None = None,
+) -> Answer:
+    return Answer(
+        id=id or uuid4(),
+        user=user or generate_telegram_id(faker),
+        question=question or uuid4(),
+        option=option or faker.random_int(min=0, max=2),
     )
