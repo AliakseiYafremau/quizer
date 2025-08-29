@@ -22,4 +22,4 @@ class SurveyReportDTO:
     survey: UUID
     selections: tuple[
         tuple[str, tuple[tuple[UUID, int], ...]], ...
-    ]  # Пользователь: [Вопрос: Ответ]
+    ]  # User: [Question: Answer]
