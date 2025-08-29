@@ -14,6 +14,9 @@ from quizer.application.interfaces.repositories.user import UserRepository
 
 from quizer.application.interactors.user.get_user import GetUserInteractor
 from quizer.application.interactors.user.register import RegisterInteractor
+from quizer.application.interactors.user.get_user_surveys import (
+    GetUserSurveysInteractor,
+)
 from quizer.application.interactors.question.get_survey_questions import (
     GetSurveyQuestionsInteractor,
 )
@@ -74,6 +77,15 @@ class BotIoC(IoC):
     def register(self) -> Generator[RegisterInteractor, None, None]:
         with self.user_repo() as user_repo:
             yield RegisterInteractor(user_repo=user_repo)
+
+    @contextmanager
+    def get_user_surveys(
+        self, id_provider: IdProvider
+    ) -> Generator[GetUserSurveysInteractor, None, None]:
+        with self.survey_repo() as survey_repo:
+            yield GetUserSurveysInteractor(
+                id_provider=id_provider, surver_repo=survey_repo
+            )
 
     @contextmanager
     def get_surveys_questions(

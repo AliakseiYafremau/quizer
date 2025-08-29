@@ -13,6 +13,9 @@ class FakeSurveyRepository(SurveyRepository):
             questions=[],
         )
 
+    async def get_by_user_id(self, user_id):
+        return []
+
     async def get_all(self):
         return []
 

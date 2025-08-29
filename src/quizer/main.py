@@ -4,9 +4,14 @@ from aiogram_dialog import setup_dialogs
 
 from quizer.config import load_bot_token
 from quizer.bot_setup import BotIoC
+from quizer.logger import get_logger
 
 from quizer.presentation.bot.middlewares import IdProviderMiddleware
 from quizer.presentation.bot.routers.start import start_router
+from quizer.presentation.bot.routers.menu import menu_dialog
+
+
+logger = get_logger(__name__)
 
 
 def get_dispatcher() -> Dispatcher:
@@ -14,6 +19,7 @@ def get_dispatcher() -> Dispatcher:
     dp = Dispatcher(ioc=ioc)
     dp.update.middleware(IdProviderMiddleware())
     dp.include_router(start_router)
+    dp.include_router(menu_dialog)
     setup_dialogs(dp)
     return dp
 
@@ -22,6 +28,7 @@ async def bot_run():
     token = load_bot_token()
     bot = Bot(token)
 
+    logger.info("Start app")
     await get_dispatcher().start_polling(bot)
 
 

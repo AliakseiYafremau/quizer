@@ -15,6 +15,13 @@ class SurveyRepository(Protocol):
         raise NotImplementedError
 
     @abstractmethod
+    async def get_by_user_id(
+        self,
+        user_id: str,
+    ) -> list[Survey]:
+        raise NotImplementedError
+
+    @abstractmethod
     async def get_all(
         self,
     ) -> list[Survey]:

@@ -5,6 +5,9 @@ from quizer.application.interfaces.common.id_provider import IdProvider
 
 from quizer.application.interactors.user.get_user import GetUserInteractor
 from quizer.application.interactors.user.register import RegisterInteractor
+from quizer.application.interactors.user.get_user_surveys import (
+    GetUserSurveysInteractor,
+)
 from quizer.application.interactors.question.get_survey_questions import (
     GetSurveyQuestionsInteractor,
 )
@@ -27,6 +30,12 @@ class IoC(Protocol):
 
     @abstractmethod
     def register(self) -> ContextManager[RegisterInteractor]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_user_surveys(
+        self, id_provider: IdProvider
+    ) -> ContextManager[GetUserSurveysInteractor]:
         raise NotImplementedError
 
     @abstractmethod
