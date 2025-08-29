@@ -12,7 +12,7 @@ from quizer.application.interfaces.repositories.survey import SurveyRepository
 from quizer.entities.exceptions import AccessDeniedError
 
 
-async def test_user_update_with_owner(uuid_generator, faker: Faker):
+async def test_survey_update_with_owner(uuid_generator, faker: Faker):
     # Arrange
     user_id = faker.telegram_id()
     old_name = faker.unique.name()
@@ -38,7 +38,7 @@ async def test_user_update_with_owner(uuid_generator, faker: Faker):
     assert new_survey.name == new_name
 
 
-async def test_user_update_with_stranger(uuid_generator, faker: Faker):
+async def test_survey_update_with_stranger(uuid_generator, faker: Faker):
     # Arrange
     user_id = faker.unique.telegram_id()
     stranger_id = faker.unique.telegram_id()
@@ -58,6 +58,31 @@ async def test_user_update_with_stranger(uuid_generator, faker: Faker):
 
     # Act
     with pytest.raises(AccessDeniedError):
+        await interactor(survey_dto)
+
+    # Assert
+    survey_repo_mock.update.assert_not_called()
+
+
+async def test_survey_update_with_incorrect_name(uuid_generator, faker: Faker):
+    # Arrange
+    user_id = faker.telegram_id()
+    old_name = faker.unique.name()
+    new_name = 123
+
+    survey = make_survey(name=old_name, author=user_id)
+    survey_dto = UpdateSurveyDTO(uuid_generator(), new_name)  # type: ignore
+
+    survey_repo_mock = create_autospec(SurveyRepository)
+    id_provider = create_autospec(IdProvider)
+
+    id_provider.get_current_user_id.return_value = user_id
+    survey_repo_mock.get_by_id.return_value = survey
+
+    interactor = UpdateSurveyInteractor(id_provider, survey_repo_mock)
+
+    # Act
+    with pytest.raises(ValueError):
         await interactor(survey_dto)
 
     # Assert
