@@ -1,0 +1,150 @@
+from contextlib import contextmanager, ExitStack
+from typing import Generator, Any
+
+from uuid import uuid4
+
+from quizer.presentation.ioc import IoC
+
+from quizer.application.interfaces.common.id_provider import IdProvider
+from quizer.application.interfaces.common.uuid_generator import UUIDGenerator
+from quizer.application.interfaces.repositories.answer import AnswerRepository
+from quizer.application.interfaces.repositories.question import QuestionRepository
+from quizer.application.interfaces.repositories.survey import SurveyRepository
+from quizer.application.interfaces.repositories.user import UserRepository
+
+from quizer.application.interactors.user.get_user import GetUserInteractor
+from quizer.application.interactors.user.register import RegisterInteractor
+from quizer.application.interactors.question.get_survey_questions import (
+    GetSurveyQuestionsInteractor,
+)
+from quizer.application.interactors.survey.create_survey import CreateSurveryInteractor
+from quizer.application.interactors.survey.delete_survey import DeleteSurveyInteractor
+from quizer.application.interactors.survey.finish_survey import AnswerQuestionInteractor
+from quizer.application.interactors.survey.get_all_surveys import (
+    GetAllSurveysInteractor,
+)
+from quizer.application.interactors.survey.get_survey_report import (
+    GetSurveyReportInteractor,
+)
+from quizer.application.interactors.survey.update_survey import UpdateSurveyInteractor
+
+from quizer.application.factories.survey import SurveyFactory, AnswerFactory
+
+from quizer.adapters.repositories.answer import FakeAnswerRepository
+from quizer.adapters.repositories.question import FakeQuestionRepository
+from quizer.adapters.repositories.survey import FakeSurveyRepository
+from quizer.adapters.repositories.user import FakeUserRepository
+
+
+class BotIoC(IoC):
+    def __init__(self):
+        self.survey_factory = SurveyFactory(uuid_generator=self.uuid_generator())
+        self.answer_factory = AnswerFactory(uuid_generator=self.uuid_generator())
+
+    def uuid_generator(self) -> UUIDGenerator:
+        return uuid4
+
+    @contextmanager
+    def user_repo(self) -> Generator[UserRepository]:
+        yield FakeUserRepository()
+
+    @contextmanager
+    def answer_repo(self) -> Generator[AnswerRepository]:
+        yield FakeAnswerRepository()
+
+    @contextmanager
+    def question_repo(self) -> Generator[QuestionRepository]:
+        yield FakeQuestionRepository()
+
+    @contextmanager
+    def survey_repo(self) -> Generator[SurveyRepository]:
+        yield FakeSurveyRepository()
+
+    @contextmanager
+    def get_user(
+        self, id_provider: IdProvider
+    ) -> Generator[GetUserInteractor, Any, Any]:
+        with self.user_repo() as user_repo:
+            yield GetUserInteractor(
+                id_provider=id_provider,
+                user_repo=user_repo,
+            )
+
+    @contextmanager
+    def register(self) -> Generator[RegisterInteractor, Any, Any]:
+        with self.user_repo() as user_repo:
+            yield RegisterInteractor(user_repo=user_repo)
+
+    @contextmanager
+    def get_surveys_questions(
+        self,
+    ) -> Generator[GetSurveyQuestionsInteractor, Any, Any]:
+        with self.question_repo() as question_repo:
+            yield GetSurveyQuestionsInteractor(question_repo=question_repo)
+
+    @contextmanager
+    def create_survey(
+        self, id_provider: IdProvider
+    ) -> Generator[CreateSurveryInteractor, Any, Any]:
+        with self.survey_repo() as survey_repo:
+            yield CreateSurveryInteractor(
+                id_provider=id_provider,
+                survey_repo=survey_repo,
+                survey_factory=self.survey_factory,
+            )
+
+    @contextmanager
+    def delete_survey(
+        self, id_provider: IdProvider
+    ) -> Generator[DeleteSurveyInteractor, Any, Any]:
+        with self.survey_repo() as survey_repo:
+            yield DeleteSurveyInteractor(
+                survey_repo=survey_repo,
+                id_provider=id_provider,
+            )
+
+    @contextmanager
+    def answer_question(
+        self, id_provider: IdProvider
+    ) -> Generator[AnswerQuestionInteractor, Any, Any]:
+        with ExitStack() as stack:
+            question_repo = stack.enter_context(self.question_repo())
+            answer_repo = stack.enter_context(self.answer_repo())
+            yield AnswerQuestionInteractor(
+                id_provider=id_provider,
+                question_repo=question_repo,
+                answer_repo=answer_repo,
+                answer_factory=self.answer_factory,
+            )
+
+    @contextmanager
+    def get_all_surveys(self) -> Generator[GetAllSurveysInteractor, Any, Any]:
+        with self.survey_repo() as survey_repo:
+            yield GetAllSurveysInteractor(
+                survey_repo=survey_repo,
+            )
+
+    @contextmanager
+    def get_survey_report(
+        self, id_provider: IdProvider
+    ) -> Generator[GetSurveyReportInteractor, Any, Any]:
+        with ExitStack() as stack:
+            survey_repo = stack.enter_context(self.survey_repo())
+            question_repo = stack.enter_context(self.question_repo())
+            answer_repo = stack.enter_context(self.answer_repo())
+            yield GetSurveyReportInteractor(
+                id_provider=id_provider,
+                survey_repo=survey_repo,
+                question_repo=question_repo,
+                answer_repo=answer_repo,
+            )
+
+    @contextmanager
+    def update_survey(
+        self, id_provider: IdProvider
+    ) -> Generator[UpdateSurveyInteractor, Any, Any]:
+        with self.survey_repo() as survey_repo:
+            yield UpdateSurveyInteractor(
+                id_provider=id_provider,
+                survey_repo=survey_repo,
+            )
