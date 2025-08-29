@@ -51,10 +51,10 @@ async def test_get_survey_report_with_owner(
     first_answer = make_answer(
         user=first_user.id,
         survey=survey_id,
-        selections={first_question.id: 0, second_question.id: 1},
+        selections=((first_question.id, 0), (second_question.id, 1)),
     )
     second_answer = make_answer(
-        user=second_user.id, survey=survey_id, selections={first_question.id: 1}
+        user=second_user.id, survey=survey_id, selections=((first_question.id, 1),)
     )
 
     survey = make_survey(
@@ -65,10 +65,10 @@ async def test_get_survey_report_with_owner(
         name=survey.name,
         author=survey.author,
         survey=survey.id,
-        selections={
-            first_user.id: first_answer.selections,
-            second_user.id: second_answer.selections,
-        },
+        selections=(
+            (first_user.id, first_answer.selections),
+            (second_user.id, second_answer.selections),
+        ),
     )
 
     interactor = make_interactor(owner_id, survey, [first_answer, second_answer])
@@ -95,10 +95,10 @@ async def test_get_survey_report_with_stranger(
     first_answer = make_answer(
         user=first_user.id,
         survey=survey_id,
-        selections={first_question.id: 0, second_question.id: 1},
+        selections=((first_question.id, 0), (second_question.id, 1)),
     )
     second_answer = make_answer(
-        user=second_user.id, survey=survey_id, selections={first_question.id: 1}
+        user=second_user.id, survey=survey_id, selections=((first_question.id, 1),)
     )
 
     survey = make_survey(

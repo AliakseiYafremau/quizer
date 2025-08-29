@@ -5,4 +5,4 @@ from dataclasses import dataclass
 @dataclass
 class AnswerDTO:
     survey: UUID
-    selections: dict[UUID, int]
+    selections: tuple[tuple[UUID, int], ...]

@@ -43,11 +43,11 @@ def make_answer(
     id: UUID | None = None,
     user: str | None = None,
     survey: UUID | None = None,
-    selections: dict[UUID, int] | None = None,
+    selections: tuple[tuple[UUID, int], ...] | None = None,
 ) -> Answer:
     return Answer(
         id=id or uuid4(),
         user=user or generate_telegram_id(faker),
         survey=survey or uuid4(),
-        selections=selections or {},
+        selections=selections or (),
     )

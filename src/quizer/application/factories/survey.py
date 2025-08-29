@@ -22,7 +22,7 @@ class AnswerFactory:
         self._uuid_generator = uuid_generator
 
     def create_answer(
-        self, user_id: str, survey_id: UUID, selections: dict[UUID, int]
+        self, user_id: str, survey_id: UUID, selections: tuple[tuple[UUID, int], ...]
     ) -> Answer:
         return Answer(
             id=self._uuid_generator(),

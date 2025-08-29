@@ -20,4 +20,6 @@ class SurveyReportDTO:
     name: str
     author: str
     survey: UUID
-    selections: dict[str, dict[UUID, int]]  # Пользователь: [Вопрос: Ответ]
+    selections: tuple[
+        tuple[str, tuple[tuple[UUID, int], ...]], ...
+    ]  # Пользователь: [Вопрос: Ответ]
