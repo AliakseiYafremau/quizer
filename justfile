@@ -14,6 +14,12 @@
     pytest
 
 
+# Run coverage
+@coverage:
+    coverage run -m pytest
+    coverage html
+
+
 # Run linter and formatter
 @lint:
     ruff format
