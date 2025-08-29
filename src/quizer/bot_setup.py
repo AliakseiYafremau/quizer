@@ -45,25 +45,25 @@ class BotIoC(IoC):
         return uuid4
 
     @contextmanager
-    def user_repo(self) -> Generator[UserRepository]:
+    def user_repo(self) -> Generator[UserRepository, None, None]:
         yield FakeUserRepository()
 
     @contextmanager
-    def answer_repo(self) -> Generator[AnswerRepository]:
+    def answer_repo(self) -> Generator[AnswerRepository, None, None]:
         yield FakeAnswerRepository()
 
     @contextmanager
-    def question_repo(self) -> Generator[QuestionRepository]:
+    def question_repo(self) -> Generator[QuestionRepository, None, None]:
         yield FakeQuestionRepository()
 
     @contextmanager
-    def survey_repo(self) -> Generator[SurveyRepository]:
+    def survey_repo(self) -> Generator[SurveyRepository, None, None]:
         yield FakeSurveyRepository()
 
     @contextmanager
     def get_user(
         self, id_provider: IdProvider
-    ) -> Generator[GetUserInteractor, Any, Any]:
+    ) -> Generator[GetUserInteractor, None, None]:
         with self.user_repo() as user_repo:
             yield GetUserInteractor(
                 id_provider=id_provider,
@@ -71,21 +71,21 @@ class BotIoC(IoC):
             )
 
     @contextmanager
-    def register(self) -> Generator[RegisterInteractor, Any, Any]:
+    def register(self) -> Generator[RegisterInteractor, None, None]:
         with self.user_repo() as user_repo:
             yield RegisterInteractor(user_repo=user_repo)
 
     @contextmanager
     def get_surveys_questions(
         self,
-    ) -> Generator[GetSurveyQuestionsInteractor, Any, Any]:
+    ) -> Generator[GetSurveyQuestionsInteractor, None, None]:
         with self.question_repo() as question_repo:
             yield GetSurveyQuestionsInteractor(question_repo=question_repo)
 
     @contextmanager
     def create_survey(
         self, id_provider: IdProvider
-    ) -> Generator[CreateSurveryInteractor, Any, Any]:
+    ) -> Generator[CreateSurveryInteractor, None, None]:
         with self.survey_repo() as survey_repo:
             yield CreateSurveryInteractor(
                 id_provider=id_provider,
@@ -96,7 +96,7 @@ class BotIoC(IoC):
     @contextmanager
     def delete_survey(
         self, id_provider: IdProvider
-    ) -> Generator[DeleteSurveyInteractor, Any, Any]:
+    ) -> Generator[DeleteSurveyInteractor, None, None]:
         with self.survey_repo() as survey_repo:
             yield DeleteSurveyInteractor(
                 survey_repo=survey_repo,

@@ -20,3 +20,6 @@ uv.lock
 # Coverage
 .coverage
 htmlcov/
+
+# Environment variables
+.env

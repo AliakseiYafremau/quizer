@@ -7,10 +7,12 @@ authors = [
     { name = "AliakseiYafremau", email = "aleksey.yafremau@gmail.com" }
 ]
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    "aiogram-dialog>=2.4.0",
+]
 
 [project.scripts]
-quizer = "quizer:main"
+run = "quizer:main.run"
 
 [build-system]
 requires = ["uv_build>=0.8.11,<0.9.0"]
