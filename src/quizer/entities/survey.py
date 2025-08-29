@@ -9,7 +9,7 @@ class Answer:
     id: UUID
     user: str
     survey: UUID
-    selections: dict[UUID, int]
+    selections: dict[UUID, int]  # Вопрос: Ответ
 
 
 @dataclass

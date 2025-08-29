@@ -13,3 +13,11 @@ class ReadSurveyDTO:
 class UpdateSurveyDTO:
     id: UUID
     new_name: str
+
+
+@dataclass
+class SurveyReportDTO:
+    name: str
+    author: str
+    survey: UUID
+    selections: dict[str, dict[UUID, int]]  # Пользователь: [Вопрос: Ответ]

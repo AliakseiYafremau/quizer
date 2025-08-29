@@ -2,7 +2,6 @@ import pytest
 from faker import Faker
 
 from unittest.mock import create_autospec
-from uuid import uuid4
 
 from tests.factories import make_survey
 
@@ -12,9 +11,9 @@ from quizer.entities.exceptions import AccessDeniedError
 from quizer.application.interactors.survey.delete_survey import DeleteSurveyInteractor
 
 
-async def test_survery_deletion_with_owner(faker: Faker):
+async def test_survery_deletion_with_owner(uuid_generator, faker: Faker):
     # Arrange
-    survey_id = uuid4()
+    survey_id = uuid_generator()
     user_id = faker.telegram_id()
     survey_repo_mock = create_autospec(SurveyRepository)
     id_provider_stub = create_autospec(IdProvider)
@@ -28,9 +27,9 @@ async def test_survery_deletion_with_owner(faker: Faker):
     survey_repo_mock.delete.assert_called_once_with(survey_id)
 
 
-async def test_survery_deletion_with_stranger(faker: Faker):
+async def test_survery_deletion_with_stranger(uuid_generator, faker: Faker):
     # Arrange
-    survey_id = uuid4()
+    survey_id = uuid_generator()
     user_id = faker.unique.telegram_id()
     author_id = faker.unique.telegram_id()
     survey = make_survey(id=survey_id, author=author_id)

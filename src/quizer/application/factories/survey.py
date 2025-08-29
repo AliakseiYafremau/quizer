@@ -1,6 +1,3 @@
-from typing import Protocol
-from abc import abstractmethod
-
 from uuid import UUID
 
 from quizer.application.interfaces.common.uuid_generator import UUIDGenerator

@@ -1,7 +1,6 @@
 from faker import Faker
 from unittest.mock import create_autospec
 
-from uuid import UUID
 
 from tests.factories import make_answer
 

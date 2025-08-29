@@ -1,12 +1,8 @@
 from uuid import UUID
 
-from quizer.entities.survey import Question
-from quizer.application.interfaces.common.id_provider import IdProvider
 from quizer.application.interfaces.repositories.question import QuestionRepository
-from quizer.application.interfaces.repositories.survey import SurveyRepository
 from quizer.application.dto.question import ReadQuestionDTO
 from quizer.application.dto.mappers.question import to_question_dto
-from quizer.application.exceptions import TargetNotFoundError
 
 
 class GetSurveyQuestionsInteractor:

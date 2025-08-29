@@ -1,4 +1,3 @@
-from uuid import uuid4
 from faker import Faker
 
 from unittest.mock import create_autospec
@@ -6,7 +5,6 @@ from unittest.mock import create_autospec
 from quizer.application.interactors.survey.create_survey import CreateSurveryInteractor
 from quizer.application.interfaces.common.id_provider import IdProvider
 from quizer.application.interfaces.repositories.survey import SurveyRepository
-from quizer.application.factories.survey import SurveyFactory
 from quizer.entities.survey import Survey
 
 

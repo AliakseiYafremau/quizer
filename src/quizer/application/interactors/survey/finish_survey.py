@@ -1,5 +1,3 @@
-from uuid import UUID
-
 from quizer.application.interfaces.common.id_provider import IdProvider
 from quizer.application.interfaces.repositories.question import QuestionRepository
 from quizer.application.interfaces.repositories.answer import AnswerRepository
