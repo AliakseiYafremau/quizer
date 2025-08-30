@@ -4,7 +4,9 @@ from tests.factories import make_user, make_survey
 
 from quizer.application.interfaces.common.id_provider import IdProvider
 from quizer.application.interfaces.repositories.survey import SurveyRepository
-from quizer.application.interactors.user.get_user_surveys import GetUserSurveysInteractor
+from quizer.application.interactors.user.get_user_surveys import (
+    GetUserSurveysInteractor,
+)
 from quizer.application.dto.mappers.survey import to_survey_dto
 
 

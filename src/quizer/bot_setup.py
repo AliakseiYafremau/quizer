@@ -20,6 +20,9 @@ from quizer.application.interactors.user.get_user_surveys import (
 from quizer.application.interactors.question.get_survey_questions import (
     GetSurveyQuestionsInteractor,
 )
+from quizer.application.interactors.question.add_question import (
+    AddSurveyQuestionInteractor,
+)
 from quizer.application.interactors.survey.create_survey import CreateSurveryInteractor
 from quizer.application.interactors.survey.delete_survey import DeleteSurveyInteractor
 from quizer.application.interactors.survey.finish_survey import AnswerQuestionInteractor
@@ -31,7 +34,11 @@ from quizer.application.interactors.survey.get_survey_report import (
 )
 from quizer.application.interactors.survey.update_survey import UpdateSurveyInteractor
 
-from quizer.application.factories.survey import SurveyFactory, AnswerFactory
+from quizer.application.factories.survey import (
+    SurveyFactory,
+    QuestionFactory,
+    AnswerFactory,
+)
 
 from quizer.adapters.repositories.answer import FakeAnswerRepository
 from quizer.adapters.repositories.question import FakeQuestionRepository
@@ -42,6 +49,7 @@ from quizer.adapters.repositories.user import FakeUserRepository
 class BotIoC(IoC):
     def __init__(self):
         self.survey_factory = SurveyFactory(uuid_generator=self.uuid_generator())
+        self.question_factory = QuestionFactory(uuid_generator=self.uuid_generator())
         self.answer_factory = AnswerFactory(uuid_generator=self.uuid_generator())
 
     def uuid_generator(self) -> UUIDGenerator:
@@ -113,6 +121,22 @@ class BotIoC(IoC):
             yield DeleteSurveyInteractor(
                 survey_repo=survey_repo,
                 id_provider=id_provider,
+            )
+
+    @contextmanager
+    def add_question(
+        self, id_provider: IdProvider
+    ) -> Generator[AddSurveyQuestionInteractor, None, None]:
+        with ExitStack() as stack:
+            question_repo = stack.enter_context(self.question_repo())
+            survey_repo = stack.enter_context(self.survey_repo())
+            user_repo = stack.enter_context(self.user_repo())
+            yield AddSurveyQuestionInteractor(
+                id_provider=id_provider,
+                question_repo=question_repo,
+                survey_repo=survey_repo,
+                user_repo=user_repo,
+                question_factory=self.question_factory,
             )
 
     @contextmanager

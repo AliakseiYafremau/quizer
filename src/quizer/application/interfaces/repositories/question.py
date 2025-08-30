@@ -14,3 +14,7 @@ class QuestionRepository(Protocol):
     @abstractmethod
     async def get_by_survey_id(self, survey_id: UUID) -> list[Question]:
         raise NotImplementedError
+
+    @abstractmethod
+    async def add(self, question: Question) -> UUID:
+        raise NotImplementedError

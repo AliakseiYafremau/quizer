@@ -10,5 +10,8 @@ class FakeQuestionRepository(QuestionRepository):
             options=[],
         )
 
+    async def add(self, question: Question):
+        return question.id
+
     async def get_by_survey_id(self, survey_id):
         return []

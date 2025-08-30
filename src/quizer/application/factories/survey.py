@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from quizer.application.interfaces.common.uuid_generator import UUIDGenerator
-from quizer.entities.survey import Survey, Answer
+from quizer.entities.survey import Survey, Question, Answer
 
 
 class SurveyFactory:
@@ -15,6 +15,14 @@ class SurveyFactory:
             author=author,
             questions=[],
         )
+
+
+class QuestionFactory:
+    def __init__(self, uuid_generator: UUIDGenerator):
+        self._uuid_generator = uuid_generator
+
+    def create_question(self, name: str, options: list[str]) -> Question:
+        return Question(id=self._uuid_generator(), name=name, options=options)
 
 
 class AnswerFactory:
