@@ -7,6 +7,11 @@ class Menu(StatesGroup):
     my_surveys = State()
 
 
-class CreateSurvey(StatesGroup):
-    name = State()
-    success = State()
+class ManageSurvey(StatesGroup):
+    user_surveys = State()
+    create = State()
+    surveys_created = State()
+    add_question = State()
+    question_name = State()
+    option = State()
+    create_question = State()
