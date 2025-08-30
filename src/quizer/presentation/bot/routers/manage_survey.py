@@ -35,12 +35,18 @@ async def on_survey_enter(
     dialog_manager.dialog_data["survey_name"] = data
     await dialog_manager.switch_to(ManageSurvey.surveys_created)
 
-async def get_question_name(
-    dialog_manager: DialogManager, ioc: IoC, **kwargs,
+
+async def on_option_enter(
+    message: Message,
+    widget: ManagedTextInput[str],
+    dialog_manager: DialogManager,
+    data: str,
 ):
-    return {
-        "question_name": dialog_manager.find("question_name").get_value(),
-    }
+    current_options = dialog_manager.dialog_data.get("options", [])
+    current_options.append(dialog_manager.find("option").get_value())
+    dialog_manager.dialog_data["options"] = current_options
+    await dialog_manager.switch_to(ManageSurvey.question_name)
+
 
 async def on_question_enter(
     message: Message,
@@ -72,6 +78,15 @@ async def get_user_surveys(ioc: IoC, id_provider: IdProvider, **kwargs):
     }
 
 
+async def get_question_name(
+    dialog_manager: DialogManager, ioc: IoC, **kwargs,
+):
+    options = dialog_manager.dialog_data.get("options", [])
+    return {
+        "question_name": dialog_manager.find("question_name").get_value(),
+        "options": options,
+    }
+
 manager_survey = Dialog(
     Window(
         Case(
@@ -92,19 +107,23 @@ manager_survey = Dialog(
         state=ManageSurvey.user_surveys,
     ),
     Window(
-        Const("Введите название опроса"),
+        Const("<b>Создание опроса</b>\n"),
+        Const("Введите название нового <b>опроса</b>"),
         TextInput(
             id="survey_name",
             on_error=on_survey_error,
             on_success=on_survey_enter,
             type_factory=str,
         ),
+        parse_mode="html",
         state=ManageSurvey.create,
     ),
     Window(
-        Format('Опрос "{dialog_data[survey_name]}" создан.'),
+        Const("<b>Создание опроса</b>\n"),
+        Format("Название: <b>{dialog_data[survey_name]}</b>"),
         SwitchTo(Const("Добавить вопрос"), id="add_question", state=ManageSurvey.add_question),
         Start(Const("Меню"), id="menu", state=Menu.main),
+        parse_mode="html",
         getter=get_survey_questions,
         state=ManageSurvey.surveys_created,
     ),
@@ -119,12 +138,17 @@ manager_survey = Dialog(
         state=ManageSurvey.add_question,
     ),
     Window(
-        Format("Вопрос {question_name} создан"),
+        Const("<b>Создание опроса</b>\n"),
+        Format("Название: <b>{dialog_data[survey_name]}</b>\n"),
+        Const("Вопросы"),
+        Format(" - {question_name} (не сохранен)"),
+        List(Format("  - {item}"), items="options"),
         SwitchTo(Const("Просмотреть опрос"), id="get_survey", state=ManageSurvey.surveys_created),
         SwitchTo(Const("Добавить опцию"), id="add_question", state=ManageSurvey.option),
         SwitchTo(Const("Сохранить вопрос"), id="save_question", state=ManageSurvey.create_question),
         Start(Const("Меню"), id="menu", state=Menu.main),
-        getter=get_question_name,
+        parse_mode="html",
+        getter=get_question_name, # После возвращать все вопросы + question_name не сохраненный
         state=ManageSurvey.question_name,
     ),
     Window(
@@ -132,9 +156,10 @@ manager_survey = Dialog(
         TextInput(
             id="option",
             on_error=on_survey_error,
-            on_success=Back(),
+            on_success=on_option_enter,
             type_factory=str,
         ),
+        parse_mode="html",
         state=ManageSurvey.option,
     ),
     Window(
@@ -142,6 +167,7 @@ manager_survey = Dialog(
         SwitchTo(Const("Просмотреть опрос"), id="get_survey", state=ManageSurvey.surveys_created),
         SwitchTo(Const("Добавить вопрос"), id="add_question", state=ManageSurvey.add_question),
         Start(Const("Меню"), id="menu", state=Menu.main),
+        parse_mode="html",
         state=ManageSurvey.create_question,
     )
 )
