@@ -45,7 +45,7 @@ async def on_option_enter(
     current_options = dialog_manager.dialog_data.get("options", [])
     current_options.append(dialog_manager.find("option").get_value())
     dialog_manager.dialog_data["options"] = current_options
-    await dialog_manager.switch_to(ManageSurvey.question_name)
+    await dialog_manager.switch_to(ManageSurvey.survey_menu)
 
 
 async def on_question_enter(
@@ -58,6 +58,7 @@ async def on_question_enter(
     id_provider: IdProvider = dialog_manager.middleware_data["id_provider"]
     with ioc.add_question(id_provider) as interactor:
         await interactor()
+    await dialog_manager.switch_to(ManageSurvey.survey_menu)
 
 
 async def get_survey_questions(dialog_manager: DialogManager, ioc: IoC, **kwargss):
@@ -119,15 +120,16 @@ manager_survey = Dialog(
         state=ManageSurvey.create,
     ),
     Window(
-        Const("<b>Создание опроса</b>\n"),
+        Const("<b>Новый опрос создан</b>\n"),
         Format("Название: <b>{dialog_data[survey_name]}</b>"),
+        Const("Теперь вы можете добавить вопросы к вашему <b>опросу</b>"),
         SwitchTo(Const("Добавить вопрос"), id="add_question", state=ManageSurvey.add_question),
         Start(Const("Меню"), id="menu", state=Menu.main),
         parse_mode="html",
-        getter=get_survey_questions,
         state=ManageSurvey.surveys_created,
     ),
     Window(
+        Const("<b>Добавление нового вопроса</b>\n"),
         Const("Введите вопрос"),
         TextInput(
             id="question_name",
@@ -135,11 +137,11 @@ manager_survey = Dialog(
             on_success=Next(),
             type_factory=str,
         ),
+        parse_mode="html",
         state=ManageSurvey.add_question,
     ),
     Window(
-        Const("<b>Создание опроса</b>\n"),
-        Format("Название: <b>{dialog_data[survey_name]}</b>\n"),
+        Format("<b>{dialog_data[survey_name]}</b>\n"),
         Const("Вопросы"),
         Format(" - {question_name} (не сохранен)"),
         List(Format("  - {item}"), items="options"),
@@ -149,7 +151,7 @@ manager_survey = Dialog(
         Start(Const("Меню"), id="menu", state=Menu.main),
         parse_mode="html",
         getter=get_question_name, # После возвращать все вопросы + question_name не сохраненный
-        state=ManageSurvey.question_name,
+        state=ManageSurvey.survey_menu,
     ),
     Window(
         Const("Введите опцию вопроса"),

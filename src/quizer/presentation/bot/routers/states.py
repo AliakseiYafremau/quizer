@@ -12,6 +12,6 @@ class ManageSurvey(StatesGroup):
     create = State()
     surveys_created = State()
     add_question = State()
-    question_name = State()
+    survey_menu = State()
     option = State()
     create_question = State()
