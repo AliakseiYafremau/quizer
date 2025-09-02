@@ -4,7 +4,7 @@ from aiogram.types import Message
 
 from aiogram_dialog import Dialog, Window, DialogManager
 from aiogram_dialog.widgets.text import Const, Format, Multi, Case, List
-from aiogram_dialog.widgets.kbd import Start, Next, SwitchTo, Back
+from aiogram_dialog.widgets.kbd import Start, Next, SwitchTo
 from aiogram_dialog.widgets.input import TextInput, ManagedTextInput
 
 from quizer.presentation.ioc import IoC
@@ -13,6 +13,9 @@ from quizer.presentation.bot.routers.states import ManageSurvey, Menu
 from quizer.logger import get_logger
 
 logger = get_logger(__name__)
+
+
+MENU_BUTTON = Start(Const("Меню"), id="menu", state=Menu.main)
 
 
 async def on_survey_error(
@@ -80,13 +83,16 @@ async def get_user_surveys(ioc: IoC, id_provider: IdProvider, **kwargs):
 
 
 async def get_question_name(
-    dialog_manager: DialogManager, ioc: IoC, **kwargs,
+    dialog_manager: DialogManager,
+    ioc: IoC,
+    **kwargs,
 ):
     options = dialog_manager.dialog_data.get("options", [])
     return {
         "question_name": dialog_manager.find("question_name").get_value(),
         "options": options,
     }
+
 
 manager_survey = Dialog(
     Window(
@@ -101,7 +107,9 @@ manager_survey = Dialog(
             selector="has_surveys",
         ),
         Start(
-            Const("Создать новый опрос"), id="create_survey", state=ManageSurvey.create,
+            Const("Создать новый опрос"),
+            id="create_survey",
+            state=ManageSurvey.create,
         ),
         Start(Const("Меню"), id="profile", state=Menu.main),
         getter=get_user_surveys,
@@ -116,16 +124,16 @@ manager_survey = Dialog(
             on_success=on_survey_enter,
             type_factory=str,
         ),
-        parse_mode="html",
         state=ManageSurvey.create,
     ),
     Window(
         Const("<b>Новый опрос создан</b>\n"),
         Format("Название: <b>{dialog_data[survey_name]}</b>"),
         Const("Теперь вы можете добавить вопросы к вашему <b>опросу</b>"),
-        SwitchTo(Const("Добавить вопрос"), id="add_question", state=ManageSurvey.add_question),
-        Start(Const("Меню"), id="menu", state=Menu.main),
-        parse_mode="html",
+        SwitchTo(
+            Const("Добавить вопрос"), id="add_question", state=ManageSurvey.add_question
+        ),
+        MENU_BUTTON,
         state=ManageSurvey.surveys_created,
     ),
     Window(
@@ -137,7 +145,6 @@ manager_survey = Dialog(
             on_success=Next(),
             type_factory=str,
         ),
-        parse_mode="html",
         state=ManageSurvey.add_question,
     ),
     Window(
@@ -145,12 +152,19 @@ manager_survey = Dialog(
         Const("Вопросы"),
         Format(" - {question_name} (не сохранен)"),
         List(Format("  - {item}"), items="options"),
-        SwitchTo(Const("Просмотреть опрос"), id="get_survey", state=ManageSurvey.surveys_created),
+        SwitchTo(
+            Const("Просмотреть опрос"),
+            id="get_survey",
+            state=ManageSurvey.surveys_created,
+        ),
         SwitchTo(Const("Добавить опцию"), id="add_question", state=ManageSurvey.option),
-        SwitchTo(Const("Сохранить вопрос"), id="save_question", state=ManageSurvey.create_question),
-        Start(Const("Меню"), id="menu", state=Menu.main),
-        parse_mode="html",
-        getter=get_question_name, # После возвращать все вопросы + question_name не сохраненный
+        SwitchTo(
+            Const("Сохранить вопрос"),
+            id="save_question",
+            state=ManageSurvey.create_question,
+        ),
+        MENU_BUTTON,
+        getter=get_question_name,  # После возвращать все вопросы + question_name не сохраненный
         state=ManageSurvey.survey_menu,
     ),
     Window(
@@ -161,15 +175,19 @@ manager_survey = Dialog(
             on_success=on_option_enter,
             type_factory=str,
         ),
-        parse_mode="html",
         state=ManageSurvey.option,
     ),
     Window(
         Const("Вопрос успешно создан, можете вернуться в меню или создать еще."),
-        SwitchTo(Const("Просмотреть опрос"), id="get_survey", state=ManageSurvey.surveys_created),
-        SwitchTo(Const("Добавить вопрос"), id="add_question", state=ManageSurvey.add_question),
-        Start(Const("Меню"), id="menu", state=Menu.main),
-        parse_mode="html",
+        SwitchTo(
+            Const("Просмотреть опрос"),
+            id="get_survey",
+            state=ManageSurvey.surveys_created,
+        ),
+        SwitchTo(
+            Const("Добавить вопрос"), id="add_question", state=ManageSurvey.add_question
+        ),
+        MENU_BUTTON,
         state=ManageSurvey.create_question,
-    )
+    ),
 )

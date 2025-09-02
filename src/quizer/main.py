@@ -1,5 +1,6 @@
 import asyncio
 from aiogram import Bot, Dispatcher
+from aiogram.client.default import DefaultBotProperties
 from aiogram_dialog import setup_dialogs
 
 from quizer.config import load_bot_token
@@ -28,7 +29,7 @@ def get_dispatcher() -> Dispatcher:
 
 async def bot_run():
     token = load_bot_token()
-    bot = Bot(token)
+    bot = Bot(token, default=DefaultBotProperties(parse_mode="html"))
 
     logger.info("Start app")
     await get_dispatcher().start_polling(bot)
