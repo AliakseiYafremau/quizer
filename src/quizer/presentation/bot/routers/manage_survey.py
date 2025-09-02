@@ -1,11 +1,14 @@
 from typing import Any
+from uuid import UUID
 
-from aiogram.types import Message
+from aiogram.types import Message, CallbackQuery
 
 from aiogram_dialog import Dialog, Window, DialogManager
 from aiogram_dialog.widgets.text import Const, Format, Multi, Case, List
-from aiogram_dialog.widgets.kbd import Start, Next, SwitchTo
+from aiogram_dialog.widgets.kbd import Start, SwitchTo, Button
 from aiogram_dialog.widgets.input import TextInput, ManagedTextInput
+
+from quizer.application.dto.question import CreateQuestionDTO
 
 from quizer.presentation.ioc import IoC
 from quizer.presentation.bot.id_provider import IdProvider
@@ -24,7 +27,7 @@ async def on_survey_error(
     await message.answer("Название должно быть строкой!")
 
 
-async def on_survey_enter(
+async def create_survey(
     message: Message,
     widget: ManagedTextInput[str],
     dialog_manager: DialogManager,
@@ -32,6 +35,7 @@ async def on_survey_enter(
 ):
     ioc: IoC = dialog_manager.middleware_data["ioc"]
     id_provider: IdProvider = dialog_manager.middleware_data["id_provider"]
+
     with ioc.create_survey(id_provider) as interactor:
         survey_id = await interactor(data)
     dialog_manager.dialog_data["survey_id"] = survey_id
@@ -39,28 +43,44 @@ async def on_survey_enter(
     await dialog_manager.switch_to(ManageSurvey.surveys_created)
 
 
-async def on_option_enter(
+async def pre_add_question(
+    message: Message,
+    widget: ManagedTextInput[str],
+    dialog_manager: DialogManager,
+    data: str,
+):
+    dialog_manager.dialog_data["question_name"] = data
+    await dialog_manager.switch_to(ManageSurvey.survey_menu)
+
+
+async def add_option(
     message: Message,
     widget: ManagedTextInput[str],
     dialog_manager: DialogManager,
     data: str,
 ):
     current_options = dialog_manager.dialog_data.get("options", [])
-    current_options.append(dialog_manager.find("option").get_value())
+    current_options.append(data)
     dialog_manager.dialog_data["options"] = current_options
     await dialog_manager.switch_to(ManageSurvey.survey_menu)
 
 
-async def on_question_enter(
-    message: Message,
-    widget: ManagedTextInput[str],
+async def add_question(
+    callback: CallbackQuery,
+    button: Button,
     dialog_manager: DialogManager,
-    data: str,
 ):
     ioc: IoC = dialog_manager.middleware_data["ioc"]
     id_provider: IdProvider = dialog_manager.middleware_data["id_provider"]
+
+    survey_id: UUID = dialog_manager.dialog_data["survey_id"]
+    question_name: str = dialog_manager.dialog_data["question_name"]
+    options: list[str] = dialog_manager.dialog_data["options"]
+
+    dto = CreateQuestionDTO(survey_id=survey_id, name=question_name, options=options)
+
     with ioc.add_question(id_provider) as interactor:
-        await interactor()
+        await interactor(dto)
     await dialog_manager.switch_to(ManageSurvey.survey_menu)
 
 
@@ -82,14 +102,15 @@ async def get_user_surveys(ioc: IoC, id_provider: IdProvider, **kwargs):
     }
 
 
-async def get_question_name(
+async def get_question(
     dialog_manager: DialogManager,
     ioc: IoC,
     **kwargs,
 ):
+    question_name = dialog_manager.dialog_data["question_name"]
     options = dialog_manager.dialog_data.get("options", [])
     return {
-        "question_name": dialog_manager.find("question_name").get_value(),
+        "question_name": question_name,
         "options": options,
     }
 
@@ -121,7 +142,7 @@ manager_survey = Dialog(
         TextInput(
             id="survey_name",
             on_error=on_survey_error,
-            on_success=on_survey_enter,
+            on_success=create_survey,
             type_factory=str,
         ),
         state=ManageSurvey.create,
@@ -142,7 +163,7 @@ manager_survey = Dialog(
         TextInput(
             id="question_name",
             on_error=on_survey_error,
-            on_success=Next(),
+            on_success=pre_add_question,
             type_factory=str,
         ),
         state=ManageSurvey.add_question,
@@ -157,14 +178,15 @@ manager_survey = Dialog(
             id="get_survey",
             state=ManageSurvey.surveys_created,
         ),
-        SwitchTo(Const("Добавить опцию"), id="add_question", state=ManageSurvey.option),
+        SwitchTo(Const("Добавить опцию"), id="add_option", state=ManageSurvey.option),
         SwitchTo(
             Const("Сохранить вопрос"),
             id="save_question",
+            on_click=add_question,
             state=ManageSurvey.create_question,
         ),
         MENU_BUTTON,
-        getter=get_question_name,  # После возвращать все вопросы + question_name не сохраненный
+        getter=get_question,  # После возвращать все вопросы + question_name не сохраненный
         state=ManageSurvey.survey_menu,
     ),
     Window(
@@ -172,7 +194,7 @@ manager_survey = Dialog(
         TextInput(
             id="option",
             on_error=on_survey_error,
-            on_success=on_option_enter,
+            on_success=add_option,
             type_factory=str,
         ),
         state=ManageSurvey.option,
