@@ -4,3 +4,7 @@ class DomainError(Exception):
 
 class AccessDeniedError(DomainError):
     pass
+
+
+class DuplicateNameError(DomainError):
+    pass

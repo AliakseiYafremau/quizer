@@ -25,7 +25,9 @@ from quizer.application.interactors.question.add_question import (
 )
 from quizer.application.interactors.survey.create_survey import CreateSurveryInteractor
 from quizer.application.interactors.survey.delete_survey import DeleteSurveyInteractor
-from quizer.application.interactors.survey.finish_survey import AnswerQuestionInteractor
+from quizer.application.interactors.survey.answer_question import (
+    AnswerQuestionInteractor,
+)
 from quizer.application.interactors.survey.get_all_surveys import (
     GetAllSurveysInteractor,
 )
@@ -33,6 +35,7 @@ from quizer.application.interactors.survey.get_survey_report import (
     GetSurveyReportInteractor,
 )
 from quizer.application.interactors.survey.update_survey import UpdateSurveyInteractor
+from quizer.application.interactors.survey.finish_survey import SaveSurveyInteractor
 
 from quizer.application.factories.survey import (
     SurveyFactory,
@@ -112,6 +115,11 @@ class BotIoC(IoC):
                 survey_repo=survey_repo,
                 survey_factory=self.survey_factory,
             )
+
+    @contextmanager
+    def save_survey(self, id_provider: IdProvider):
+        with self.survey_repo() as survey_repo:
+            yield SaveSurveyInteractor(id_provider=id_provider, survey_repo=survey_repo)
 
     @contextmanager
     def delete_survey(

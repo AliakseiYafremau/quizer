@@ -11,6 +11,7 @@ class FakeSurveyRepository(SurveyRepository):
             name="name",
             author="author",
             questions=[],
+            is_available=False,
         )
 
     async def get_by_user_id(self, user_id):

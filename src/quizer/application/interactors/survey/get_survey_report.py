@@ -26,8 +26,10 @@ class GetSurveyReportInteractor:
         survey = await self._survey_repo.get_by_id(survey_id)
         if survey is None:
             raise TargetNotFoundError("Survey was not found")
+
         survey.can_manage(user_id)
         answers = await self._answer_repo.get_by_survey_id(survey_id)
+
         selections = tuple((answer.user, answer.selections) for answer in answers)
         report_dto = SurveyReportDTO(
             name=survey.name,

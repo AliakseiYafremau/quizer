@@ -14,6 +14,7 @@ class SurveyFactory:
             name=name,
             author=author,
             questions=[],
+            is_available=False,
         )
 
 

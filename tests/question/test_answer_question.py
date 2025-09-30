@@ -8,7 +8,7 @@ from quizer.application.interfaces.common.id_provider import IdProvider
 from quizer.application.interfaces.repositories.question import QuestionRepository
 from quizer.application.interfaces.repositories.answer import AnswerRepository
 from quizer.application.dto.answer import AnswerDTO
-from quizer.application.interactors.survey.finish_survey import (
+from quizer.application.interactors.survey.answer_question import (
     AnswerQuestionInteractor,
 )
 

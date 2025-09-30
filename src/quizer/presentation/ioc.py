@@ -16,7 +16,10 @@ from quizer.application.interactors.question.add_question import (
 )
 from quizer.application.interactors.survey.create_survey import CreateSurveryInteractor
 from quizer.application.interactors.survey.delete_survey import DeleteSurveyInteractor
-from quizer.application.interactors.survey.finish_survey import AnswerQuestionInteractor
+from quizer.application.interactors.survey.answer_question import (
+    AnswerQuestionInteractor,
+)
+from quizer.application.interactors.survey.finish_survey import SaveSurveyInteractor
 from quizer.application.interactors.survey.get_all_surveys import (
     GetAllSurveysInteractor,
 )
@@ -49,6 +52,12 @@ class IoC(Protocol):
     def create_survey(
         self, id_provider: IdProvider
     ) -> ContextManager[CreateSurveryInteractor]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def save_survey(
+        self, id_provider: IdProvider
+    ) -> ContextManager[SaveSurveyInteractor]:
         raise NotImplementedError
 
     @abstractmethod

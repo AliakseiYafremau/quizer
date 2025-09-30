@@ -36,6 +36,7 @@ def make_survey(
         name=name or faker.sentence(),
         author=author or faker.telegram_id(),
         questions=questions or [uuid4() for _ in range(5)],
+        is_available=False,
     )
 
 

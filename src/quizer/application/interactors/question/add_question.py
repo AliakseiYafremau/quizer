@@ -29,6 +29,7 @@ class AddSurveyQuestionInteractor:
         user_surveys = await self._survey_repo.get_by_user_id(user_id)
         if question_data.survey_id not in user_surveys:
             raise TargetNotFoundError("Survey was not found")
+
         new_question = self._question_factory.create_question(
             name=question_data.name, options=question_data.options
         )

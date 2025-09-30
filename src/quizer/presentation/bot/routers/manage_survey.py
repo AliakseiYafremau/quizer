@@ -19,6 +19,17 @@ logger = get_logger(__name__)
 
 
 MENU_BUTTON = Start(Const("Меню"), id="menu", state=Menu.main)
+LOOK_SURVEY = SwitchTo(
+    Const("Просмотреть опрос"),
+    id="get_survey",
+    state=ManageSurvey.surveys_created,
+)
+ADD_QUESTION = SwitchTo(
+    Const("Добавить вопрос"), id="add_question", state=ManageSurvey.add_question
+)
+SAVE_SURVEY = SwitchTo(
+    Const("Сохранить опрос"), id="save_survey", state=ManageSurvey.survey_menu
+)
 
 
 async def on_survey_error(
@@ -151,9 +162,7 @@ manager_survey = Dialog(
         Const("<b>Новый опрос создан</b>\n"),
         Format("Название: <b>{dialog_data[survey_name]}</b>"),
         Const("Теперь вы можете добавить вопросы к вашему <b>опросу</b>"),
-        SwitchTo(
-            Const("Добавить вопрос"), id="add_question", state=ManageSurvey.add_question
-        ),
+        ADD_QUESTION,
         MENU_BUTTON,
         state=ManageSurvey.surveys_created,
     ),
@@ -173,11 +182,6 @@ manager_survey = Dialog(
         Const("Вопросы"),
         Format(" - {question_name} (не сохранен)"),
         List(Format("  - {item}"), items="options"),
-        SwitchTo(
-            Const("Просмотреть опрос"),
-            id="get_survey",
-            state=ManageSurvey.surveys_created,
-        ),
         SwitchTo(Const("Добавить опцию"), id="add_option", state=ManageSurvey.option),
         SwitchTo(
             Const("Сохранить вопрос"),
@@ -201,15 +205,14 @@ manager_survey = Dialog(
     ),
     Window(
         Const("Вопрос успешно создан, можете вернуться в меню или создать еще."),
-        SwitchTo(
-            Const("Просмотреть опрос"),
-            id="get_survey",
-            state=ManageSurvey.surveys_created,
-        ),
-        SwitchTo(
-            Const("Добавить вопрос"), id="add_question", state=ManageSurvey.add_question
-        ),
+        LOOK_SURVEY,
+        ADD_QUESTION,
         MENU_BUTTON,
         state=ManageSurvey.create_question,
     ),
+    Window(
+        Const("Опрос успешно создан."),
+        getter=get_survey_questions,
+        state=ManageSurvey.survey_saved,
+    )
 )

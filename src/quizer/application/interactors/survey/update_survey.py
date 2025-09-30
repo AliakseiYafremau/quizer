@@ -14,6 +14,8 @@ class UpdateSurveyInteractor:
         survey = await self._survey_repo.get_by_id(survey_data.id)
         if survey is None:
             raise TargetNotFoundError("Survey was not found")
+
         survey.can_manage(user_id)
         survey.update_name(survey_data.new_name)
+
         await self._survey_repo.update(survey)

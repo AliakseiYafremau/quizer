@@ -9,6 +9,7 @@ authors = [
 requires-python = ">=3.11"
 dependencies = [
     "aiogram-dialog>=2.4.0",
+    "psycopg[binary]>=3.2.10",
 ]
 
 [project.scripts]

@@ -15,3 +15,4 @@ class ManageSurvey(StatesGroup):
     survey_menu = State()
     option = State()
     create_question = State()
+    survey_saved = State()
