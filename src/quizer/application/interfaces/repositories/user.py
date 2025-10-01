@@ -6,7 +6,7 @@ from quizer.entities.user import User
 
 class UserRepository(Protocol):
     @abstractmethod
-    async def get_by_id(self, id: str) -> User:
+    async def get_by_id(self, id: str) -> User | None:
         raise NotImplementedError
 
     @abstractmethod

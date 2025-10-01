@@ -44,10 +44,10 @@ from quizer.application.factories.survey import (
     AnswerFactory,
 )
 
-from quizer.adapters.repositories.answer import FakeAnswerRepository
-from quizer.adapters.repositories.question import FakeQuestionRepository
-from quizer.adapters.repositories.survey import FakeSurveyRepository
-from quizer.adapters.repositories.user import FakeUserRepository
+from quizer.adapters.repositories.fake.answer import FakeAnswerRepository
+from quizer.adapters.repositories.fake.question import FakeQuestionRepository
+from quizer.adapters.repositories.fake.survey import FakeSurveyRepository
+from quizer.adapters.repositories.fake.user import FakeUserRepository
 
 
 class BotIoC(IoC):
