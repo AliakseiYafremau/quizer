@@ -27,7 +27,8 @@ class AddSurveyQuestionInteractor:
     async def __call__(self, question_data: CreateQuestionDTO) -> UUID:
         user_id = self._id_provider.get_current_user_id()
         user_surveys = await self._survey_repo.get_by_user_id(user_id)
-        if question_data.survey_id not in user_surveys:
+
+        if not any(question_data.survey_id == survey.id for survey in user_surveys):
             raise TargetNotFoundError("Survey was not found")
 
         new_question = self._question_factory.create_question(

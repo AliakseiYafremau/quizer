@@ -10,3 +10,7 @@ def get_env_variable(key: str) -> str:
 
 def load_bot_token() -> str:
     return get_env_variable("TOKEN")
+
+
+def load_db_url() -> str:
+    return get_env_variable("DB_URL")

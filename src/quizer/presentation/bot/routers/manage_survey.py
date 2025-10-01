@@ -54,6 +54,22 @@ async def create_survey(
     await dialog_manager.switch_to(ManageSurvey.surveys_created)
 
 
+async def save_survey(
+    callback: CallbackQuery,
+    button: Button,
+    dialog_manager: DialogManager,
+):
+    ioc: IoC = dialog_manager.middleware_data["ioc"]
+    id_provider: IdProvider = dialog_manager.middleware_data["id_provider"]
+
+    survey_id = dialog_manager.dialog_data["survey_id"]
+
+    with ioc.save_survey(id_provider=id_provider) as interactor:
+        await interactor(survey_id)
+
+    await dialog_manager.switch_to(ManageSurvey.user_surveys)
+
+
 async def pre_add_question(
     message: Message,
     widget: ManagedTextInput[str],
@@ -92,6 +108,7 @@ async def add_question(
 
     with ioc.add_question(id_provider) as interactor:
         await interactor(dto)
+
     await dialog_manager.switch_to(ManageSurvey.survey_menu)
 
 
@@ -181,7 +198,7 @@ manager_survey = Dialog(
         Format("<b>{dialog_data[survey_name]}</b>\n"),
         Const("Вопросы"),
         Format(" - {question_name} (не сохранен)"),
-        List(Format("  - {item}"), items="options"),
+        List(Format("    - {item}"), items="options"),
         SwitchTo(Const("Добавить опцию"), id="add_option", state=ManageSurvey.option),
         SwitchTo(
             Const("Сохранить вопрос"),
@@ -214,5 +231,5 @@ manager_survey = Dialog(
         Const("Опрос успешно создан."),
         getter=get_survey_questions,
         state=ManageSurvey.survey_saved,
-    )
+    ),
 )

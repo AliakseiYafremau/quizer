@@ -3,7 +3,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram_dialog import setup_dialogs
 
-from quizer.config import load_bot_token
+from quizer.config import load_bot_token, load_db_url
 from quizer.bot_setup import BotIoC
 from quizer.logger import get_logger
 
@@ -17,7 +17,7 @@ logger = get_logger(__name__)
 
 
 def get_dispatcher() -> Dispatcher:
-    ioc = BotIoC()
+    ioc = BotIoC(db_url=load_db_url())
     dp = Dispatcher(ioc=ioc)
     dp.update.middleware(IdProviderMiddleware())
     dp.include_router(start_router)
