@@ -49,12 +49,10 @@ from quizer.adapters.repositories.question import FakeQuestionRepository
 from quizer.adapters.repositories.survey import FakeSurveyRepository
 from quizer.adapters.repositories.user import FakeUserRepository
 
-from quizer.adapters.database import get_async_connection, get_async_session
-
 
 class BotIoC(IoC):
-    def __init__(self, db_url: str):
-        self.db_url = db_url
+    def __init__(self, db_connection: psycopg.AsyncConnection):
+        self.db_connection = db_connection
         self.survey_factory = SurveyFactory(uuid_generator=self.uuid_generator())
         self.question_factory = QuestionFactory(uuid_generator=self.uuid_generator())
         self.answer_factory = AnswerFactory(uuid_generator=self.uuid_generator())
@@ -63,13 +61,9 @@ class BotIoC(IoC):
         return uuid4
 
     @asynccontextmanager
-    async def get_connection(self) -> AsyncGenerator[psycopg.AsyncConnection]:
-        yield await get_async_connection(self.db_url)
-
-    @asynccontextmanager
     async def get_session(self) -> AsyncGenerator[psycopg.AsyncCursor]:
-        async with self.get_connection() as connection:
-            yield await get_async_session(connection=connection)
+        async with self.db_connection.cursor() as cursor:
+            yield cursor
 
     @contextmanager
     def user_repo(self) -> Generator[UserRepository, None, None]:

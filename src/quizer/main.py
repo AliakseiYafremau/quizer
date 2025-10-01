@@ -1,4 +1,5 @@
 import asyncio
+import psycopg
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram_dialog import setup_dialogs
@@ -16,8 +17,9 @@ from quizer.presentation.bot.routers.manage_survey import manager_survey
 logger = get_logger(__name__)
 
 
-def get_dispatcher() -> Dispatcher:
-    ioc = BotIoC(db_url=load_db_url())
+async def get_dispatcher() -> Dispatcher:
+    async with await psycopg.AsyncConnection.connect(load_db_url()) as connection:
+        ioc = BotIoC(db_connection=connection)
     dp = Dispatcher(ioc=ioc)
     dp.update.middleware(IdProviderMiddleware())
     dp.include_router(start_router)
@@ -32,7 +34,8 @@ async def bot_run():
     bot = Bot(token, default=DefaultBotProperties(parse_mode="html"))
 
     logger.info("Start app")
-    await get_dispatcher().start_polling(bot)
+    dispatcher = await get_dispatcher()
+    await dispatcher.start_polling(bot)
 
 
 def run():
