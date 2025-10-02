@@ -12,9 +12,9 @@ class SQLUserRepository(UserRepository):
     async def get_by_id(self, id: str) -> User | None:
         await self.session.execute("SELECT id, name FROM users WHERE id = &s", (id,))
         row = await self.session.fetchone()
-        if row is not None:
-            return UserFactory().create_user(id=row[0], name=row[1])
-        return None
+        if row is None:
+            return None
+        return UserFactory().create_user(id=row[0], name=row[1])
 
     async def add(self, user: User) -> str:
         await self.session.execute(
