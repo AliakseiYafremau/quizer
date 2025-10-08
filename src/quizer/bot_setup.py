@@ -57,11 +57,12 @@ class BotIoC(IoC):
         self.question_factory = QuestionFactory(uuid_generator=self.uuid_generator())
         self.answer_factory = AnswerFactory(uuid_generator=self.uuid_generator())
 
-    def uuid_generator(self) -> UUIDGenerator:
+    @staticmethod
+    def uuid_generator() -> UUIDGenerator:
         return uuid4
 
     @asynccontextmanager
-    async def get_session(self) -> AsyncGenerator[psycopg.AsyncCursor]:
+    async def get_session(self) -> AsyncGenerator[psycopg.AsyncCursor, None]:
         async with self.db_connection.cursor() as cursor:
             yield cursor
 

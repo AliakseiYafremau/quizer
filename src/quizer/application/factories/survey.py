@@ -8,7 +8,7 @@ class SurveyFactory:
     def __init__(self, uuid_generator: UUIDGenerator):
         self._uuid_generator = uuid_generator
 
-    def create_survey(self, name: str, author: str, id: UUID = None) -> Survey:
+    def create_survey(self, name: str, author: str, id: UUID | None = None) -> Survey:
         survey_id = id or self._uuid_generator()
         return Survey(
             id=survey_id,
@@ -24,7 +24,7 @@ class QuestionFactory:
         self._uuid_generator = uuid_generator
 
     def create_question(
-        self, name: str, options: list[str], id: UUID = None
+        self, name: str, options: list[str], id: UUID | None = None
     ) -> Question:
         question_id = id or self._uuid_generator()
         return Question(id=question_id, name=name, options=options)
@@ -39,7 +39,7 @@ class AnswerFactory:
         user_id: str,
         survey_id: UUID,
         selections: tuple[tuple[UUID, int], ...],
-        id: UUID = None,
+        id: UUID | None = None,
     ) -> Answer:
         answer_id = id or self._uuid_generator()
         return Answer(
