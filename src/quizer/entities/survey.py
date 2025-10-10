@@ -16,6 +16,7 @@ class Answer:
 class Question:
     id: UUID
     name: str
+    survey: UUID
     options: list[str]
 
     def __post_init__(self):

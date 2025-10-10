@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5432:${DB_PORT}"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  migrations:
+    build:
+      context: ./migrations
+      dockerfile: Dockerfile
+    command: postgres "postgres://postgres:1234@postgres:5432/postgres" up
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:

@@ -13,4 +13,9 @@ def load_bot_token() -> str:
 
 
 def load_db_url() -> str:
-    return get_env_variable("DB_URL")
+    user = get_env_variable("DB_USER")
+    password = get_env_variable("DB_PASS")
+    port = get_env_variable("DB_PORT")
+    host = get_env_variable("DB_HOST")
+    database = get_env_variable("DB_NAME")
+    return f"postgresql://{user}:{password}@{host}:{port}/{database}"
