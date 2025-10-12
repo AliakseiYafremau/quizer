@@ -24,10 +24,10 @@ class QuestionFactory:
         self._uuid_generator = uuid_generator
 
     def create_question(
-        self, name: str, options: list[str], id: UUID | None = None
+        self, name: str, survey: UUID, options: list[str], id: UUID | None = None
     ) -> Question:
         question_id = id or self._uuid_generator()
-        return Question(id=question_id, name=name, options=options)
+        return Question(id=question_id, name=name, survey=survey, options=options)
 
 
 class AnswerFactory:

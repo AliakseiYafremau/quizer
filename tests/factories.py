@@ -16,11 +16,15 @@ def make_user(id: str | None = None, name: str | None = None) -> User:
 
 
 def make_question(
-    id: UUID | None = None, name: str | None = None, options: list[str] | None = None
+    id: UUID | None = None,
+    name: str | None = None,
+    survey: UUID | None = None,
+    options: list[str] | None = None,
 ) -> Question:
     return Question(
         id=id or uuid4(),
         name=name or faker.sentence(),
+        survey=survey or uuid4(),
         options=options or [faker.sentence() for _ in range(3)],
     )
 

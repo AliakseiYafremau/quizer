@@ -16,11 +16,12 @@ class SQLQuestionRepository(QuestionRepository):
             """
             SELECT
                 questions.name,
+                questions.survey_id,
                 questions_options.value
             FROM questions
             LEFT JOIN questions_options
-            ON questions_options.question_id = &s
-            WHERE id = &s
+            ON questions_options.question_id = questions.id
+            WHERE id = %s
             """,
             (question_id, question_id),
         )
@@ -29,12 +30,12 @@ class SQLQuestionRepository(QuestionRepository):
         if not rows:
             return None
 
-        if rows[0][1] is None:
-            return self.question_factory.create_question(
-                id=question_id, name=rows[0][0], options=[]
-            )
+        name = rows[0][0]
+        survey_id = rows[0][1]
+        options = [row[2] for row in rows if row[2] is not None]
+
         return self.question_factory.create_question(
-            id=question_id, name=rows[0][0], options=[row[1] for row in rows]
+            id=question_id, name=name, survey=survey_id, options=options
         )
 
     async def get_by_survey_id(self, survey_id: UUID) -> list[Question]:
@@ -43,47 +44,49 @@ class SQLQuestionRepository(QuestionRepository):
             SELECT
                 questions.id,
                 questions.name,
+                questions.survey_id,
                 questions_options.value
             FROM questions
             LEFT JOIN questions_options
             ON question.id = questions_options.question_id
-            WHERE questions.survey_id = &s
+            WHERE questions.survey_id = %s
             """,
             (survey_id,),
         )
         rows = await self.session.fetchall()
         if not rows:
             return []
-        questions_map = {}
-        for id, name, option in rows:
-            if option is None and id not in questions_map:
-                questions_map[id] = {
+
+        questions_map: dict[str, dict] = {}
+        for id, name, survey_id, option in rows:
+            bucket = questions_map.setdefault(
+                id,
+                {
                     "name": name,
+                    "survey": survey_id,
                     "options": [],
-                }
-            elif option is not None and id not in questions_map:
-                questions_map[id] = {
-                    "name": name,
-                    "options": [option],
-                }
-            elif option is not None and id in questions_map:
-                questions_map[id]["options"].append(option)
+                },
+            )
+        if option is not None:
+            bucket["options"].append(option)
+
         return [
             self.question_factory.create_question(
-                id=id_key,
-                name=questions_map[id_key]["name"],
-                options=questions_map[id_key]["options"],
+                id=UUID(id),
+                name=data["name"],
+                survey=UUID(data["survey"]),
+                options=data["options"],
             )
-            for id_key in questions_map.keys()
+            for id, data in questions_map.items()
         ]
 
     async def add(self, question: Question):
         await self.session.execute(
-            """INSERT INTO users (id, name) VALUES (&s, &s, &s)""",
+            """INSERT INTO questions (id, name, survey_id) VALUES (%s, %s, %s)""",
             (question.id, question.name),
         )
         for option in question.options:
             await self.session.execute(
-                """INSERT INTO questions_options (value, question_id) VALUES (&s, &s)""",
-                (option, question.id),
+                """INSERT INTO questions_options (id, value, question_id) VALUES (%s, %s, %s)""",
+                (question.id, option, question.id),
             )

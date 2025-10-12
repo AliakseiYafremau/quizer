@@ -32,6 +32,8 @@ class AddSurveyQuestionInteractor:
             raise TargetNotFoundError("Survey was not found")
 
         new_question = self._question_factory.create_question(
-            name=question_data.name, options=question_data.options
+            name=question_data.name,
+            options=question_data.options,
+            survey=question_data.survey_id,
         )
         return await self._question_repo.add(new_question)
