@@ -38,7 +38,11 @@ from quizer.application.interactors.survey.get_survey_report import (
 from quizer.application.interactors.survey.update_survey import UpdateSurveyInteractor
 from quizer.application.interactors.survey.finish_survey import SaveSurveyInteractor
 
-from quizer.application.factories.survey import SurveyFactory, QuestionFactory, AnswerFactory
+from quizer.application.factories.survey import (
+    SurveyFactory,
+    QuestionFactory,
+    AnswerFactory,
+)
 from quizer.application.factories.user import UserFactory
 
 from quizer.adapters.repositories.postgres.answer import SQLAnswerRepository
@@ -170,7 +174,9 @@ class BotIoC(IoC):
                 session=session, question_factory=self.question_factory
             )
             survey_repo = SQLSurveyRepository(session=session)
-            user_repo = SQLUserRepository(session=session, user_factory=self.user_factory)
+            user_repo = SQLUserRepository(
+                session=session, user_factory=self.user_factory
+            )
             yield AddSurveyQuestionInteractor(
                 id_provider=id_provider,
                 question_repo=question_repo,

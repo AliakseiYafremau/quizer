@@ -35,9 +35,7 @@ class SQLAnswerRepository(AnswerRepository):
             return None
 
         answer_id = rows[0][0]
-        selections = [
-            (UUID(row[3]), row[4]) for row in rows if row[3] is not None
-        ]
+        selections = [(UUID(row[3]), row[4]) for row in rows if row[3] is not None]
         return self.answer_factory.create_answer(
             user_id=rows[0][1],
             survey_id=rows[0][2],
@@ -88,7 +86,7 @@ class SQLAnswerRepository(AnswerRepository):
             )
             for answer_id, data in answers_map.items()
         ]
-    
+
     async def add(self, answer: Answer) -> UUID:
         await self.session.execute(
             """INSERT INTO answers (id, user_id, survey_id) VALUES (%s, %s, %s)""",

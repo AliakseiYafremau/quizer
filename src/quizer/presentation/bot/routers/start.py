@@ -23,12 +23,15 @@ async def register(message: Message, ioc: IoC, dialog_manager: DialogManager):
         message.from_user.username,  # type: ignore
     )
     async with ioc.register() as interactor:
-        await interactor(
-            UserDTO(
-                id=message.from_user.id,  # type: ignore
-                name=message.from_user.username,  # type: ignore
+        try:
+            await interactor(
+                UserDTO(
+                    id=message.from_user.id,  # type: ignore
+                    name=message.from_user.username,  # type: ignore
+                )
             )
-        )
+        except Exception as e:
+            pass
     await dialog_manager.start(
         state=Menu.main,
         mode=StartMode.RESET_STACK,

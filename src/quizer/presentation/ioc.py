@@ -31,7 +31,9 @@ from quizer.application.interactors.survey.update_survey import UpdateSurveyInte
 
 class IoC(Protocol):
     @abstractmethod
-    def get_user(self, id_provider: IdProvider) -> AsyncContextManager[GetUserInteractor]:
+    def get_user(
+        self, id_provider: IdProvider
+    ) -> AsyncContextManager[GetUserInteractor]:
         raise NotImplementedError
 
     @abstractmethod
@@ -45,7 +47,9 @@ class IoC(Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    def get_surveys_questions(self) -> AsyncContextManager[GetSurveyQuestionsInteractor]:
+    def get_surveys_questions(
+        self,
+    ) -> AsyncContextManager[GetSurveyQuestionsInteractor]:
         raise NotImplementedError
 
     @abstractmethod
