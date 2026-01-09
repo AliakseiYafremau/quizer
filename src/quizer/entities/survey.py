@@ -6,6 +6,34 @@ from quizer.entities.exceptions import AccessDeniedError, DuplicateNameError
 
 @dataclass
 class Answer:
+    """Answer entity
+
+    Each answer has a unique id and belongs to a specific survey. An answer is associated with a user who provided it.
+
+    Example:
+        User(id='user_1'),
+        Survey(
+            id=SURVEY_ID
+        ),
+        Question(
+            id=FIRST_QUESTION_ID,
+            survey=SURVEY_ID,
+            options=['option_1', 'option_2']
+        ),
+        Question(
+            id=SECOND_QUESTION_ID,
+            survey=SURVEY_ID,
+            options=['option_3', 'option_4']
+        ),
+
+        Answer(
+            ...
+            user='user_1',
+            selecitons=(
+                (FIRST_QUESTION_ID, 0),  # user_1 selects 'option_1'
+                (SECOND_QUESTION_ID, 1),  # user_1 selects 'option_4'
+            )
+    """
     id: UUID
     user: str
     survey: UUID
@@ -14,6 +42,9 @@ class Answer:
 
 @dataclass
 class Question:
+    """Question entity
+    
+    Each question has a unique id, a name. A question belongs to a survey and can have multiple options of answer."""
     id: UUID
     name: str
     survey: UUID
@@ -32,6 +63,11 @@ class Question:
 
 @dataclass
 class Survey:
+    """Survey entity
+    
+    Each survey has a unique id, a name. An author is the user who created the survey.
+    A survey contains multiple questions. A survey can be marked as available only if
+    all its questions have unique names and all questions are prepared."""
     id: UUID
     name: str
     author: str
