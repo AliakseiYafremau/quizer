@@ -22,7 +22,7 @@ async def register(message: Message, ioc: IoC, dialog_manager: DialogManager):
         message.from_user.id,  # type: ignore
         message.from_user.username,  # type: ignore
     )
-    with ioc.register() as interactor:
+    async with ioc.register() as interactor:
         await interactor(
             UserDTO(
                 id=message.from_user.id,  # type: ignore

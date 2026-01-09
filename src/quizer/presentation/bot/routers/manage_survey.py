@@ -47,7 +47,7 @@ async def create_survey(
     ioc: IoC = dialog_manager.middleware_data["ioc"]
     id_provider: IdProvider = dialog_manager.middleware_data["id_provider"]
 
-    with ioc.create_survey(id_provider) as interactor:
+    async with ioc.create_survey(id_provider) as interactor:
         survey_id = await interactor(data)
     dialog_manager.dialog_data["survey_id"] = survey_id
     dialog_manager.dialog_data["survey_name"] = data
@@ -64,7 +64,7 @@ async def save_survey(
 
     survey_id = dialog_manager.dialog_data["survey_id"]
 
-    with ioc.save_survey(id_provider=id_provider) as interactor:
+    async with ioc.save_survey(id_provider=id_provider) as interactor:
         await interactor(survey_id)
 
     await dialog_manager.switch_to(ManageSurvey.user_surveys)
@@ -106,7 +106,7 @@ async def add_question(
 
     dto = CreateQuestionDTO(survey_id=survey_id, name=question_name, options=options)
 
-    with ioc.add_question(id_provider) as interactor:
+    async with ioc.add_question(id_provider) as interactor:
         await interactor(dto)
 
     await dialog_manager.switch_to(ManageSurvey.survey_menu)
@@ -114,7 +114,7 @@ async def add_question(
 
 async def get_survey_questions(dialog_manager: DialogManager, ioc: IoC, **kwargss):
     survey_id = dialog_manager.dialog_data["survey_id"]
-    with ioc.get_surveys_questions() as interactor:
+    async with ioc.get_surveys_questions() as interactor:
         questions = await interactor(survey_id)
     return {
         "questions": questions,
@@ -122,7 +122,7 @@ async def get_survey_questions(dialog_manager: DialogManager, ioc: IoC, **kwargs
 
 
 async def get_user_surveys(ioc: IoC, id_provider: IdProvider, **kwargs):
-    with ioc.get_user_surveys(id_provider) as interactor:
+    async with ioc.get_user_surveys(id_provider) as interactor:
         surveys_data = await interactor()
     return {
         "surveys": surveys_data,

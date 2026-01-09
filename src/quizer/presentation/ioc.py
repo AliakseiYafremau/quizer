@@ -1,4 +1,4 @@
-from typing import Protocol, ContextManager
+from typing import Protocol, AsyncContextManager
 from abc import abstractmethod
 
 from quizer.application.interfaces.common.id_provider import IdProvider
@@ -31,65 +31,65 @@ from quizer.application.interactors.survey.update_survey import UpdateSurveyInte
 
 class IoC(Protocol):
     @abstractmethod
-    def get_user(self, id_provider: IdProvider) -> ContextManager[GetUserInteractor]:
+    def get_user(self, id_provider: IdProvider) -> AsyncContextManager[GetUserInteractor]:
         raise NotImplementedError
 
     @abstractmethod
-    def register(self) -> ContextManager[RegisterInteractor]:
+    def register(self) -> AsyncContextManager[RegisterInteractor]:
         raise NotImplementedError
 
     @abstractmethod
     def get_user_surveys(
         self, id_provider: IdProvider
-    ) -> ContextManager[GetUserSurveysInteractor]:
+    ) -> AsyncContextManager[GetUserSurveysInteractor]:
         raise NotImplementedError
 
     @abstractmethod
-    def get_surveys_questions(self) -> ContextManager[GetSurveyQuestionsInteractor]:
+    def get_surveys_questions(self) -> AsyncContextManager[GetSurveyQuestionsInteractor]:
         raise NotImplementedError
 
     @abstractmethod
     def create_survey(
         self, id_provider: IdProvider
-    ) -> ContextManager[CreateSurveryInteractor]:
+    ) -> AsyncContextManager[CreateSurveryInteractor]:
         raise NotImplementedError
 
     @abstractmethod
     def save_survey(
         self, id_provider: IdProvider
-    ) -> ContextManager[SaveSurveyInteractor]:
+    ) -> AsyncContextManager[SaveSurveyInteractor]:
         raise NotImplementedError
 
     @abstractmethod
     def delete_survey(
         self, id_provider: IdProvider
-    ) -> ContextManager[DeleteSurveyInteractor]:
+    ) -> AsyncContextManager[DeleteSurveyInteractor]:
         raise NotImplementedError
 
     @abstractmethod
     def add_question(
         self, id_provider: IdProvider
-    ) -> ContextManager[AddSurveyQuestionInteractor]:
+    ) -> AsyncContextManager[AddSurveyQuestionInteractor]:
         raise NotImplementedError
 
     @abstractmethod
     def answer_question(
         self, id_provider: IdProvider
-    ) -> ContextManager[AnswerQuestionInteractor]:
+    ) -> AsyncContextManager[AnswerQuestionInteractor]:
         raise NotImplementedError
 
     @abstractmethod
-    def get_all_surveys(self) -> ContextManager[GetAllSurveysInteractor]:
+    def get_all_surveys(self) -> AsyncContextManager[GetAllSurveysInteractor]:
         raise NotImplementedError
 
     @abstractmethod
     def get_survey_report(
         self, id_provider: IdProvider
-    ) -> ContextManager[GetSurveyReportInteractor]:
+    ) -> AsyncContextManager[GetSurveyReportInteractor]:
         raise NotImplementedError
 
     @abstractmethod
     def update_survey(
         self, id_provider: IdProvider
-    ) -> ContextManager[UpdateSurveyInteractor]:
+    ) -> AsyncContextManager[UpdateSurveyInteractor]:
         raise NotImplementedError

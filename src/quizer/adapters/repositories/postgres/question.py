@@ -87,7 +87,7 @@ class SQLQuestionRepository(QuestionRepository):
     async def add(self, question: Question):
         await self.session.execute(
             """INSERT INTO questions (id, name, survey_id) VALUES (%s, %s, %s)""",
-            (question.id, question.name),
+            (question.id, question.name, question.survey),
         )
         if question.options:
             await self.session.executemany(

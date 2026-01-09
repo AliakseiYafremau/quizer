@@ -19,6 +19,6 @@ class SQLUserRepository(UserRepository):
 
     async def add(self, user: User) -> str:
         await self.session.execute(
-            "INSERT INTO users (id, name) VALUES (&s, &s)", (user.id, user.name)
+            "INSERT INTO users (id, name) VALUES (%s, %s)", (user.id, user.name)
         )
         return user.id

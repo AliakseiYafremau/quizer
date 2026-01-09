@@ -8,7 +8,7 @@ from quizer.presentation.bot.routers.states import Menu, ManageSurvey
 
 
 async def get_user_data(ioc: IoC, id_provider: IdProvider, **kwargs):
-    with ioc.get_user(id_provider) as interactor:
+    async with ioc.get_user(id_provider) as interactor:
         user_data = await interactor()
     return {
         "user_id": user_data.id,
