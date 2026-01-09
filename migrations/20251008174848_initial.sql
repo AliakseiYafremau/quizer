@@ -20,15 +20,17 @@ CREATE TABLE answers (
     user_id CHAR NOT NULL REFERENCES users(id),
     survey_id CHAR NOT NULL REFERENCES survey(id)
 );
-CREATE TABLE questions_options (`
+CREATE TABLE questions_options (
     id SERIAL PRIMARY KEY,
     question_id CHAR NOT NULL REFERENCES questions(id),
-    value VARCHAR
+    value VARCHAR,
+    position INT NOT NULL
 );
 CREATE TABLE questions_answers (
     id SERIAL PRIMARY KEY,
     answer_id CHAR NOT NULL REFERENCES answers(id),
-    option CHAR NOT NULL REFERENCES questions_options(id),
+    question_id CHAR NOT NULL REFERENCES questions(id),
+    option_index INT NOT NULL
 );
 -- +goose StatementEnd
 

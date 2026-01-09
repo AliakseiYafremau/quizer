@@ -19,9 +19,12 @@ class SQLAnswerRepository(AnswerRepository):
         if answer.selections:
             await self.session.executemany(
                 """
-                INSERT INTO questions_answers (answer_id, option)
-                VALUES (%s, %s)
+                INSERT INTO questions_answers (answer_id, question_id, option_index)
+                VALUES (%s, %s, %s)
                 """,
-                [(answer.id, selection) for selection in answer.selections]
+                [
+                    (answer.id, question_id, option_index)
+                    for question_id, option_index in answer.selections
+                ],
             )
         return answer.id

@@ -17,13 +17,15 @@ class SQLQuestionRepository(QuestionRepository):
             SELECT
                 questions.name,
                 questions.survey_id,
-                questions_options.value
+                questions_options.value,
+                questions_options.position
             FROM questions
             LEFT JOIN questions_options
             ON questions_options.question_id = questions.id
             WHERE id = %s
+            ORDER BY questions_options.position
             """,
-            (question_id, question_id),
+            (question_id,),
         )
         rows = await self.session.fetchall()
 
@@ -45,11 +47,13 @@ class SQLQuestionRepository(QuestionRepository):
                 questions.id,
                 questions.name,
                 questions.survey_id,
-                questions_options.value
+                questions_options.value,
+                questions_options.position
             FROM questions
             LEFT JOIN questions_options
-            ON question.id = questions_options.question_id
+            ON questions.id = questions_options.question_id
             WHERE questions.survey_id = %s
+            ORDER BY questions.id, questions_options.position
             """,
             (survey_id,),
         )
@@ -58,7 +62,7 @@ class SQLQuestionRepository(QuestionRepository):
             return []
 
         questions_map: dict[str, dict] = {}
-        for id, name, survey_id, option in rows:
+        for id, name, survey_id, option, position in rows:
             bucket = questions_map.setdefault(
                 id,
                 {
@@ -67,15 +71,15 @@ class SQLQuestionRepository(QuestionRepository):
                     "options": [],
                 },
             )
-        if option is not None:
-            bucket["options"].append(option)
+            if option is not None:
+                bucket["options"].append((position, option))
 
         return [
             self.question_factory.create_question(
                 id=UUID(id),
                 name=data["name"],
                 survey=UUID(data["survey"]),
-                options=data["options"],
+                options=[option for _, option in sorted(data["options"])],
             )
             for id, data in questions_map.items()
         ]
@@ -88,9 +92,12 @@ class SQLQuestionRepository(QuestionRepository):
         if question.options:
             await self.session.executemany(
                 """
-                INSERT INTO questions_options (value, question_id)
-                VALUES (%s, %s)
+                INSERT INTO questions_options (value, question_id, position)
+                VALUES (%s, %s, %s)
                 """,
-                [(option, question.id) for option in question.options],
+                [
+                    (option, question.id, position)
+                    for position, option in enumerate(question.options)
+                ],
             )
         return question.id
