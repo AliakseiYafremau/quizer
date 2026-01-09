@@ -9,7 +9,7 @@ class Answer:
     id: UUID
     user: str
     survey: UUID
-    selections: tuple[tuple[UUID, int], ...]  # Answer: Question
+    selections: tuple[tuple[UUID, int], ...]  # (Question, Option)
 
 
 @dataclass

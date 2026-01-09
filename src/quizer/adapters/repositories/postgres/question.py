@@ -85,8 +85,12 @@ class SQLQuestionRepository(QuestionRepository):
             """INSERT INTO questions (id, name, survey_id) VALUES (%s, %s, %s)""",
             (question.id, question.name),
         )
-        for option in question.options:
-            await self.session.execute(
-                """INSERT INTO questions_options (id, value, question_id) VALUES (%s, %s, %s)""",
-                (question.id, option, question.id),
+        if question.options:
+            await self.session.executemany(
+                """
+                INSERT INTO questions_options (value, question_id)
+                VALUES (%s, %s)
+                """,
+                [(option, question.id) for option in question.options],
             )
+        return question.id

@@ -13,6 +13,9 @@ def load_bot_token() -> str:
 
 
 def load_db_url() -> str:
+    db_url = environ.get("DB_URL")
+    if db_url:
+        return db_url
     user = get_env_variable("DB_USER")
     password = get_env_variable("DB_PASS")
     port = get_env_variable("DB_PORT")
