@@ -1,4 +1,4 @@
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from quizer.entities.survey import Survey
 from quizer.application.interfaces.repositories.survey import SurveyRepository
@@ -17,7 +17,7 @@ class FakeSurveyRepository(SurveyRepository):
     async def get_by_user_id(self, user_id):
         return [
             Survey(
-                id="id",
+                id=uuid4(),
                 name="name",
                 author=user_id,
                 questions=[],

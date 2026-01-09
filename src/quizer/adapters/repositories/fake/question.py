@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from quizer.entities.survey import Question
 from quizer.application.interfaces.repositories.question import QuestionRepository
 
@@ -8,6 +10,7 @@ class FakeQuestionRepository(QuestionRepository):
             id=question_id,
             name="name",
             options=[],
+            survey=uuid4(),
         )
 
     async def add(self, question: Question):

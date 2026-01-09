@@ -13,7 +13,7 @@ from quizer.application.dto.mappers.survey import to_survey_dto
 async def test_user_surveys_recieving():
     # Arrange
     user = make_user()
-    surveys = [make_survey(author=user) for _ in range(3)]
+    surveys = [make_survey(author=user.id) for _ in range(3)]
     surveys_dto = list(map(to_survey_dto, surveys))
     id_provider = create_autospec(IdProvider)
     survey_repo_mock = create_autospec(SurveyRepository)
