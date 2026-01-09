@@ -77,6 +77,7 @@ async def pre_add_question(
     data: str,
 ):
     dialog_manager.dialog_data["question_name"] = data
+    dialog_manager.dialog_data["options"] = []
     await dialog_manager.switch_to(ManageSurvey.survey_menu)
 
 
@@ -108,6 +109,9 @@ async def add_question(
 
     async with ioc.add_question(id_provider) as interactor:
         await interactor(dto)
+
+    del dialog_manager.dialog_data["question_name"]
+    del dialog_manager.dialog_data["options"]
 
     await dialog_manager.switch_to(ManageSurvey.survey_menu)
 
