@@ -1,5 +1,5 @@
 import psycopg
-from contextlib import asynccontextmanager, AsyncExitStack
+from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
 from uuid import uuid4
@@ -48,8 +48,8 @@ from quizer.adapters.repositories.postgres.user import SQLUserRepository
 
 
 class BotIoC(IoC):
-    def __init__(self, db_connection: psycopg.AsyncConnection):
-        self.db_connection = db_connection
+    def __init__(self, db_url: str):
+        self.db_url = db_url
         self.survey_factory = SurveyFactory(uuid_generator=self.uuid_generator())
         self.question_factory = QuestionFactory(uuid_generator=self.uuid_generator())
         self.answer_factory = AnswerFactory(uuid_generator=self.uuid_generator())
@@ -61,36 +61,44 @@ class BotIoC(IoC):
 
     @asynccontextmanager
     async def get_session(self) -> AsyncGenerator[psycopg.AsyncCursor, None]:
-        async with self.db_connection.cursor() as cursor:
-            yield cursor
+        async with await psycopg.AsyncConnection.connect(self.db_url) as connection:
+            async with connection.cursor() as cursor:
+                yield cursor
 
     @asynccontextmanager
-    async def user_repo(self) -> AsyncGenerator[UserRepository, None]:
-        async with self.get_session() as session:
-            yield SQLUserRepository(session=session, user_factory=self.user_factory)
+    async def user_repo(
+        self, session: psycopg.AsyncCursor
+    ) -> AsyncGenerator[UserRepository, None]:
+        yield SQLUserRepository(session=session, user_factory=self.user_factory)
 
     @asynccontextmanager
-    async def answer_repo(self) -> AsyncGenerator[AnswerRepository, None]:
-        async with self.get_session() as session:
-            yield SQLAnswerRepository(session=session, answer_factory=self.answer_factory)
+    async def answer_repo(
+        self, session: psycopg.AsyncCursor
+    ) -> AsyncGenerator[AnswerRepository, None]:
+        yield SQLAnswerRepository(session=session, answer_factory=self.answer_factory)
 
     @asynccontextmanager
-    async def question_repo(self) -> AsyncGenerator[QuestionRepository, None]:
-        async with self.get_session() as session:
-            yield SQLQuestionRepository(
-                session=session, question_factory=self.question_factory
-            )
+    async def question_repo(
+        self, session: psycopg.AsyncCursor
+    ) -> AsyncGenerator[QuestionRepository, None]:
+        yield SQLQuestionRepository(
+            session=session, question_factory=self.question_factory
+        )
 
     @asynccontextmanager
-    async def survey_repo(self) -> AsyncGenerator[SurveyRepository, None]:
-        async with self.get_session() as session:
-            yield SQLSurveyRepository(session=session)
+    async def survey_repo(
+        self, session: psycopg.AsyncCursor
+    ) -> AsyncGenerator[SurveyRepository, None]:
+        yield SQLSurveyRepository(session=session)
 
     @asynccontextmanager
     async def get_user(
         self, id_provider: IdProvider
     ) -> AsyncGenerator[GetUserInteractor, None]:
-        async with self.user_repo() as user_repo:
+        async with self.get_session() as session:
+            user_repo = SQLUserRepository(
+                session=session, user_factory=self.user_factory
+            )
             yield GetUserInteractor(
                 id_provider=id_provider,
                 user_repo=user_repo,
@@ -98,14 +106,18 @@ class BotIoC(IoC):
 
     @asynccontextmanager
     async def register(self) -> AsyncGenerator[RegisterInteractor, None]:
-        async with self.user_repo() as user_repo:
+        async with self.get_session() as session:
+            user_repo = SQLUserRepository(
+                session=session, user_factory=self.user_factory
+            )
             yield RegisterInteractor(user_repo=user_repo)
 
     @asynccontextmanager
     async def get_user_surveys(
         self, id_provider: IdProvider
     ) -> AsyncGenerator[GetUserSurveysInteractor, None]:
-        async with self.survey_repo() as survey_repo:
+        async with self.get_session() as session:
+            survey_repo = SQLSurveyRepository(session=session)
             yield GetUserSurveysInteractor(
                 id_provider=id_provider, surver_repo=survey_repo
             )
@@ -114,14 +126,18 @@ class BotIoC(IoC):
     async def get_surveys_questions(
         self,
     ) -> AsyncGenerator[GetSurveyQuestionsInteractor, None]:
-        async with self.question_repo() as question_repo:
+        async with self.get_session() as session:
+            question_repo = SQLQuestionRepository(
+                session=session, question_factory=self.question_factory
+            )
             yield GetSurveyQuestionsInteractor(question_repo=question_repo)
 
     @asynccontextmanager
     async def create_survey(
         self, id_provider: IdProvider
     ) -> AsyncGenerator[CreateSurveryInteractor, None]:
-        async with self.survey_repo() as survey_repo:
+        async with self.get_session() as session:
+            survey_repo = SQLSurveyRepository(session=session)
             yield CreateSurveryInteractor(
                 id_provider=id_provider,
                 survey_repo=survey_repo,
@@ -130,14 +146,16 @@ class BotIoC(IoC):
 
     @asynccontextmanager
     async def save_survey(self, id_provider: IdProvider):
-        async with self.survey_repo() as survey_repo:
+        async with self.get_session() as session:
+            survey_repo = SQLSurveyRepository(session=session)
             yield SaveSurveyInteractor(id_provider=id_provider, survey_repo=survey_repo)
 
     @asynccontextmanager
     async def delete_survey(
         self, id_provider: IdProvider
     ) -> AsyncGenerator[DeleteSurveyInteractor, None]:
-        async with self.survey_repo() as survey_repo:
+        async with self.get_session() as session:
+            survey_repo = SQLSurveyRepository(session=session)
             yield DeleteSurveyInteractor(
                 survey_repo=survey_repo,
                 id_provider=id_provider,
@@ -147,10 +165,12 @@ class BotIoC(IoC):
     async def add_question(
         self, id_provider: IdProvider
     ) -> AsyncGenerator[AddSurveyQuestionInteractor, None]:
-        async with AsyncExitStack() as stack:
-            question_repo = await stack.enter_async_context(self.question_repo())
-            survey_repo = await stack.enter_async_context(self.survey_repo())
-            user_repo = await stack.enter_async_context(self.user_repo())
+        async with self.get_session() as session:
+            question_repo = SQLQuestionRepository(
+                session=session, question_factory=self.question_factory
+            )
+            survey_repo = SQLSurveyRepository(session=session)
+            user_repo = SQLUserRepository(session=session, user_factory=self.user_factory)
             yield AddSurveyQuestionInteractor(
                 id_provider=id_provider,
                 question_repo=question_repo,
@@ -163,9 +183,13 @@ class BotIoC(IoC):
     async def answer_question(
         self, id_provider: IdProvider
     ) -> AsyncGenerator[AnswerQuestionInteractor, None]:
-        async with AsyncExitStack() as stack:
-            question_repo = await stack.enter_async_context(self.question_repo())
-            answer_repo = await stack.enter_async_context(self.answer_repo())
+        async with self.get_session() as session:
+            question_repo = SQLQuestionRepository(
+                session=session, question_factory=self.question_factory
+            )
+            answer_repo = SQLAnswerRepository(
+                session=session, answer_factory=self.answer_factory
+            )
             yield AnswerQuestionInteractor(
                 id_provider=id_provider,
                 question_repo=question_repo,
@@ -175,7 +199,8 @@ class BotIoC(IoC):
 
     @asynccontextmanager
     async def get_all_surveys(self) -> AsyncGenerator[GetAllSurveysInteractor, None]:
-        async with self.survey_repo() as survey_repo:
+        async with self.get_session() as session:
+            survey_repo = SQLSurveyRepository(session=session)
             yield GetAllSurveysInteractor(
                 survey_repo=survey_repo,
             )
@@ -184,10 +209,14 @@ class BotIoC(IoC):
     async def get_survey_report(
         self, id_provider: IdProvider
     ) -> AsyncGenerator[GetSurveyReportInteractor, None]:
-        async with AsyncExitStack() as stack:
-            survey_repo = await stack.enter_async_context(self.survey_repo())
-            question_repo = await stack.enter_async_context(self.question_repo())
-            answer_repo = await stack.enter_async_context(self.answer_repo())
+        async with self.get_session() as session:
+            survey_repo = SQLSurveyRepository(session=session)
+            question_repo = SQLQuestionRepository(
+                session=session, question_factory=self.question_factory
+            )
+            answer_repo = SQLAnswerRepository(
+                session=session, answer_factory=self.answer_factory
+            )
             yield GetSurveyReportInteractor(
                 id_provider=id_provider,
                 survey_repo=survey_repo,
@@ -199,7 +228,8 @@ class BotIoC(IoC):
     async def update_survey(
         self, id_provider: IdProvider
     ) -> AsyncGenerator[UpdateSurveyInteractor, None]:
-        async with self.survey_repo() as survey_repo:
+        async with self.get_session() as session:
+            survey_repo = SQLSurveyRepository(session=session)
             yield UpdateSurveyInteractor(
                 id_provider=id_provider,
                 survey_repo=survey_repo,

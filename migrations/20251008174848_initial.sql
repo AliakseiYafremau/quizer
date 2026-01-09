@@ -1,35 +1,35 @@
 -- +goose Up
 -- +goose StatementBegin
 CREATE TABLE users (
-    id CHAR PRIMARY KEY,
+    id VARCHAR PRIMARY KEY,
     name VARCHAR NOT NULL
 );
 CREATE TABLE survey (
-    id CHAR PRIMARY KEY,
-    name CHAR NOT NULL,
-    author CHAR REFERENCES users(id),
+    id VARCHAR PRIMARY KEY,
+    name VARCHAR NOT NULL,
+    author VARCHAR REFERENCES users(id),
     is_available BOOLEAN
 );
 CREATE TABLE questions (
-    id CHAR PRIMARY KEY,
-    name CHAR NOT NULL,
-    survey_id CHAR REFERENCES survey(id)
+    id VARCHAR PRIMARY KEY,
+    name VARCHAR NOT NULL,
+    survey_id VARCHAR REFERENCES survey(id)
 );
 CREATE TABLE answers (
-    id CHAR PRIMARY KEY,
-    user_id CHAR NOT NULL REFERENCES users(id),
-    survey_id CHAR NOT NULL REFERENCES survey(id)
+    id VARCHAR PRIMARY KEY,
+    user_id VARCHAR NOT NULL REFERENCES users(id),
+    survey_id VARCHAR NOT NULL REFERENCES survey(id)
 );
 CREATE TABLE questions_options (
     id SERIAL PRIMARY KEY,
-    question_id CHAR NOT NULL REFERENCES questions(id),
+    question_id VARCHAR NOT NULL REFERENCES questions(id),
     value VARCHAR,
     position INT NOT NULL
 );
 CREATE TABLE questions_answers (
     id SERIAL PRIMARY KEY,
-    answer_id CHAR NOT NULL REFERENCES answers(id),
-    question_id CHAR NOT NULL REFERENCES questions(id),
+    answer_id VARCHAR NOT NULL REFERENCES answers(id),
+    question_id VARCHAR NOT NULL REFERENCES questions(id),
     option_index INT NOT NULL
 );
 -- +goose StatementEnd

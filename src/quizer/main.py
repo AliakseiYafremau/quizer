@@ -1,5 +1,4 @@
 import asyncio
-import psycopg
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram_dialog import setup_dialogs
@@ -18,8 +17,7 @@ logger = get_logger(__name__)
 
 
 async def get_dispatcher() -> Dispatcher:
-    async with await psycopg.AsyncConnection.connect(load_db_url()) as connection:
-        ioc = BotIoC(db_connection=connection)
+    ioc = BotIoC(db_url=load_db_url())
     dp = Dispatcher(ioc=ioc)
     dp.update.middleware(IdProviderMiddleware())
     dp.include_router(start_router)
