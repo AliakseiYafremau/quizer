@@ -14,6 +14,12 @@ from quizer.application.interactors.question.get_survey_questions import (
 from quizer.application.interactors.question.add_question import (
     AddSurveyQuestionInteractor,
 )
+from quizer.application.interactors.question.update_question import (
+    UpdateQuestionInteractor,
+)
+from quizer.application.interactors.question.delete_question import (
+    DeleteQuestionInteractor,
+)
 from quizer.application.interactors.survey.create_survey import CreateSurveryInteractor
 from quizer.application.interactors.survey.delete_survey import DeleteSurveyInteractor
 from quizer.application.interactors.survey.answer_question import (
@@ -74,6 +80,18 @@ class IoC(Protocol):
     def add_question(
         self, id_provider: IdProvider
     ) -> AsyncContextManager[AddSurveyQuestionInteractor]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def update_question(
+        self, id_provider: IdProvider
+    ) -> AsyncContextManager[UpdateQuestionInteractor]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def delete_question(
+        self, id_provider: IdProvider
+    ) -> AsyncContextManager[DeleteQuestionInteractor]:
         raise NotImplementedError
 
     @abstractmethod

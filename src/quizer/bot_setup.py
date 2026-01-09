@@ -24,6 +24,12 @@ from quizer.application.interactors.question.get_survey_questions import (
 from quizer.application.interactors.question.add_question import (
     AddSurveyQuestionInteractor,
 )
+from quizer.application.interactors.question.update_question import (
+    UpdateQuestionInteractor,
+)
+from quizer.application.interactors.question.delete_question import (
+    DeleteQuestionInteractor,
+)
 from quizer.application.interactors.survey.create_survey import CreateSurveryInteractor
 from quizer.application.interactors.survey.delete_survey import DeleteSurveyInteractor
 from quizer.application.interactors.survey.answer_question import (
@@ -183,6 +189,36 @@ class BotIoC(IoC):
                 survey_repo=survey_repo,
                 user_repo=user_repo,
                 question_factory=self.question_factory,
+            )
+
+    @asynccontextmanager
+    async def update_question(
+        self, id_provider: IdProvider
+    ) -> AsyncGenerator[UpdateQuestionInteractor, None]:
+        async with self.get_session() as session:
+            question_repo = SQLQuestionRepository(
+                session=session, question_factory=self.question_factory
+            )
+            survey_repo = SQLSurveyRepository(session=session)
+            yield UpdateQuestionInteractor(
+                id_provider=id_provider,
+                question_repo=question_repo,
+                survey_repo=survey_repo,
+            )
+
+    @asynccontextmanager
+    async def delete_question(
+        self, id_provider: IdProvider
+    ) -> AsyncGenerator[DeleteQuestionInteractor, None]:
+        async with self.get_session() as session:
+            question_repo = SQLQuestionRepository(
+                session=session, question_factory=self.question_factory
+            )
+            survey_repo = SQLSurveyRepository(session=session)
+            yield DeleteQuestionInteractor(
+                id_provider=id_provider,
+                question_repo=question_repo,
+                survey_repo=survey_repo,
             )
 
     @asynccontextmanager
