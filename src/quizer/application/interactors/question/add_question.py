@@ -10,6 +10,10 @@ from quizer.application.exceptions import TargetNotFoundError
 
 
 class AddSurveyQuestionInteractor:
+    """Add a question to a survey.
+    
+    Add a question to a survey if the survey belongs to the current user. Otherwise,
+    raise TargetNotFoundError."""
     def __init__(
         self,
         id_provider: IdProvider,

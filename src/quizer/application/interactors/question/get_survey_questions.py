@@ -6,6 +6,10 @@ from quizer.application.dto.mappers.question import to_question_dto
 
 
 class GetSurveyQuestionsInteractor:
+    """Get all questions for a given survey.
+    
+    Returns a list of ReadQuestionDTO objects representing the questions
+    associated with the specified survey ID."""
     def __init__(
         self,
         question_repo: QuestionRepository,
