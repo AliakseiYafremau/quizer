@@ -101,3 +101,38 @@ class SQLQuestionRepository(QuestionRepository):
                 ],
             )
         return question.id
+
+    async def delete(self, question_id: UUID) -> None:
+        await self.session.execute(
+            "DELETE FROM questions_answers WHERE question_id = %s",
+            (question_id,),
+        )
+        await self.session.execute(
+            "DELETE FROM questions_options WHERE question_id = %s",
+            (question_id,),
+        )
+        await self.session.execute(
+            "DELETE FROM questions WHERE id = %s",
+            (question_id,),
+        )
+
+    async def update(self, question: Question) -> None:
+        await self.session.execute(
+            "UPDATE questions SET name = %s WHERE id = %s",
+            (question.name, question.id),
+        )
+        await self.session.execute(
+            "DELETE FROM questions_options WHERE question_id = %s",
+            (question.id,),
+        )
+        if question.options:
+            await self.session.executemany(
+                """
+                INSERT INTO questions_options (value, question_id, position)
+                VALUES (%s, %s, %s)
+                """,
+                [
+                    (option, question.id, position)
+                    for position, option in enumerate(question.options)
+                ],
+            )

@@ -12,7 +12,7 @@ class ReadSurveyDTO:
 @dataclass
 class UpdateSurveyDTO:
     id: UUID
-    new_name: str
+    new_name: str | None = None
 
 
 @dataclass

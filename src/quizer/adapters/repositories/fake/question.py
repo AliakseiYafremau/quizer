@@ -18,3 +18,9 @@ class FakeQuestionRepository(QuestionRepository):
 
     async def get_by_survey_id(self, survey_id):
         return []
+
+    async def delete(self, question_id):
+        pass
+
+    async def update(self, question):
+        pass

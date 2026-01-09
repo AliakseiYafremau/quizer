@@ -62,6 +62,16 @@ class Question:
             raise DuplicateNameError
         self.options.append(option)
 
+    def update_name(self, name: str):
+        if not isinstance(name, str):
+            raise ValueError("Name must be string")
+        self.name = name
+
+    def replace_options(self, options: list[str]):
+        if len(set(options)) != len(options):
+            raise DuplicateNameError
+        self.options = list(options)
+
 
 @dataclass
 class Survey:

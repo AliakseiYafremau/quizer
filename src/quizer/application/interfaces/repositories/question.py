@@ -18,3 +18,11 @@ class QuestionRepository(Protocol):
     @abstractmethod
     async def add(self, question: Question) -> UUID:
         raise NotImplementedError
+
+    @abstractmethod
+    async def delete(self, question_id: UUID) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def update(self, question: Question) -> None:
+        raise NotImplementedError
