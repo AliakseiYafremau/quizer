@@ -5,12 +5,12 @@ from aiogram_dialog import setup_dialogs
 
 from quizer.config import load_bot_token, load_db_url
 from quizer.bot_setup import BotIoC
-from quizer.logger import get_logger
+from quizer.application.logger import get_logger
 
 from quizer.presentation.bot.middlewares import IdProviderMiddleware
 from quizer.presentation.bot.routers.start import start_router
 from quizer.presentation.bot.routers.menu import menu_dialog
-from quizer.presentation.bot.routers.manage_survey import manager_survey
+from quizer.presentation.bot.routers.survey.manage_survey import manager_survey
 
 
 logger = get_logger(__name__)
