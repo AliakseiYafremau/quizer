@@ -1,3 +1,4 @@
+import io
 from uuid import UUID
 
 from aiogram.types import Message, CallbackQuery
@@ -72,9 +73,15 @@ async def get_question(
     ioc: IoC,
     **kwargs,
 ):
+    ioc: IoC = dialog_manager.middleware_data["ioc"]
+
+    async with ioc.get_surveys_questions() as interactor:
+        questions = await interactor(dialog_manager.dialog_data["survey_id"])
+
     question_name = dialog_manager.dialog_data["question_name"]
     options = dialog_manager.dialog_data.get("options", [])
     return {
+        "current_questions": questions,
         "question_name": question_name,
         "options": options,
     }
@@ -94,6 +101,7 @@ question_creation =Window(
 current_question = Window(
         Format("<b>{dialog_data[survey_name]}</b>\n"),
         Const("Вопросы"),
+        List(Format(" - {item.name}"), items="current_questions"),
         Format(" - {question_name} (не сохранен)"),
         List(Format("    - {item}"), items="options"),
         SwitchTo(Const("Добавить опцию"), id="add_option", state=ManageSurvey.option),
@@ -121,7 +129,6 @@ option_creation =Window(
 
 finish_question =Window(
         Const("Вопрос успешно создан, можете вернуться в меню или создать еще."),
-        LOOK_SURVEY,
         ADD_QUESTION,
         MENU_BUTTON,
         state=ManageSurvey.create_question,
