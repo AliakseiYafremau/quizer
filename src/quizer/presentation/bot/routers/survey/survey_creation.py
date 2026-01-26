@@ -33,22 +33,22 @@ async def create_survey(
 
 
 survey_creation = Window(
-        Const("<b>Создание опроса</b>\n"),
-        Const("Введите название нового <b>опроса</b>"),
-        TextInput(
-            id="survey_name",
-            on_error=on_survey_error,
-            on_success=create_survey,
-            type_factory=str,
-        ),
-        state=ManageSurvey.create,
-    )
+    Const("<b>Создание опроса</b>\n"),
+    Const("Введите название нового <b>опроса</b>"),
+    TextInput(
+        id="survey_name",
+        on_error=on_survey_error,
+        on_success=create_survey,
+        type_factory=str,
+    ),
+    state=ManageSurvey.create,
+)
 
-survey_created =Window(
-        Const("<b>Новый опрос создан</b>\n"),
-        Format("Название: <b>{dialog_data[survey_name]}</b>"),
-        Const("Теперь вы можете добавить вопросы к вашему <b>опросу</b>"),
-        ADD_QUESTION,
-        MENU_BUTTON,
-        state=ManageSurvey.surveys_created,
-    )
+survey_created = Window(
+    Const("<b>Новый опрос создан</b>\n"),
+    Format("Название: <b>{dialog_data[survey_name]}</b>"),
+    Const("Теперь вы можете добавить вопросы к вашему <b>опросу</b>"),
+    ADD_QUESTION,
+    MENU_BUTTON,
+    state=ManageSurvey.surveys_created,
+)

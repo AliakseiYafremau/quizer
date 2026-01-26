@@ -1,4 +1,3 @@
-
 from aiogram.types import CallbackQuery
 
 from aiogram_dialog import Dialog, Window, DialogManager
@@ -46,8 +45,6 @@ async def get_survey_questions(dialog_manager: DialogManager, ioc: IoC, **kwargs
     return {
         "questions": questions,
     }
-
-
 
 
 manager_survey = Dialog(

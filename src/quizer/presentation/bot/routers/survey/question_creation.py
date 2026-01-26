@@ -1,4 +1,3 @@
-import io
 from uuid import UUID
 
 from aiogram.types import Message, CallbackQuery
@@ -14,12 +13,10 @@ from quizer.presentation.bot.routers.survey.common import (
     on_survey_error,
     ADD_QUESTION,
     MENU_BUTTON,
-    LOOK_SURVEY,
 )
 from quizer.presentation.ioc import IoC
 from quizer.presentation.bot.id_provider import IdProvider
 from quizer.presentation.bot.routers.states import ManageSurvey
-
 
 
 async def pre_add_question(
@@ -74,9 +71,10 @@ async def get_question(
     **kwargs,
 ):
     ioc: IoC = dialog_manager.middleware_data["ioc"]
+    survey_id: UUID = dialog_manager.dialog_data["survey_id"]
 
     async with ioc.get_surveys_questions() as interactor:
-        questions = await interactor(dialog_manager.dialog_data["survey_id"])
+        questions = await interactor(survey_id)
 
     question_name = dialog_manager.dialog_data["question_name"]
     options = dialog_manager.dialog_data.get("options", [])
@@ -86,50 +84,51 @@ async def get_question(
         "options": options,
     }
 
-question_creation =Window(
-        Const("<b>Добавление нового вопроса</b>\n"),
-        Const("Введите вопрос"),
-        TextInput(
-            id="question_name",
-            on_error=on_survey_error,
-            on_success=pre_add_question,
-            type_factory=str,
-        ),
-        state=ManageSurvey.add_question,
-    )
+
+question_creation = Window(
+    Const("<b>Добавление нового вопроса</b>\n"),
+    Const("Введите вопрос"),
+    TextInput(
+        id="question_name",
+        on_error=on_survey_error,
+        on_success=pre_add_question,
+        type_factory=str,
+    ),
+    state=ManageSurvey.add_question,
+)
 
 current_question = Window(
-        Format("<b>{dialog_data[survey_name]}</b>\n"),
-        Const("Вопросы"),
-        List(Format(" - {item.name}"), items="current_questions"),
-        Format(" - {question_name} (не сохранен)"),
-        List(Format("    - {item}"), items="options"),
-        SwitchTo(Const("Добавить опцию"), id="add_option", state=ManageSurvey.option),
-        SwitchTo(
-            Const("Сохранить вопрос"),
-            id="save_question",
-            on_click=add_question,
-            state=ManageSurvey.create_question,
-        ),
-        MENU_BUTTON,
-        getter=get_question,  # После возвращать все вопросы + question_name не сохраненный
-        state=ManageSurvey.survey_menu,
-    )
-option_creation =Window(
-        Const("Введите опцию вопроса"),
-        TextInput(
-            id="option",
-            on_error=on_survey_error,
-            on_success=add_option,
-            type_factory=str,
-        ),
-        state=ManageSurvey.option,
-    )
-
-
-finish_question =Window(
-        Const("Вопрос успешно создан, можете вернуться в меню или создать еще."),
-        ADD_QUESTION,
-        MENU_BUTTON,
+    Format("<b>{dialog_data[survey_name]}</b>\n"),
+    Const("Вопросы"),
+    List(Format(" - {item.name}"), items="current_questions"),
+    Format(" - {question_name} (не сохранен)"),
+    List(Format("    - {item}"), items="options"),
+    SwitchTo(Const("Добавить опцию"), id="add_option", state=ManageSurvey.option),
+    SwitchTo(
+        Const("Сохранить вопрос"),
+        id="save_question",
+        on_click=add_question,
         state=ManageSurvey.create_question,
-    )
+    ),
+    MENU_BUTTON,
+    getter=get_question,  # После возвращать все вопросы + question_name не сохраненный
+    state=ManageSurvey.survey_menu,
+)
+option_creation = Window(
+    Const("Введите опцию вопроса"),
+    TextInput(
+        id="option",
+        on_error=on_survey_error,
+        on_success=add_option,
+        type_factory=str,
+    ),
+    state=ManageSurvey.option,
+)
+
+
+finish_question = Window(
+    Const("Вопрос успешно создан, можете вернуться в меню или создать еще."),
+    ADD_QUESTION,
+    MENU_BUTTON,
+    state=ManageSurvey.create_question,
+)
