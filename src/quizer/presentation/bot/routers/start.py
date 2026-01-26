@@ -6,7 +6,7 @@ from aiogram_dialog import DialogManager, StartMode
 
 from quizer.application.dto.user import UserDTO
 from quizer.presentation.ioc import IoC
-from quizer.logger import get_logger
+from quizer.application.logger import get_logger
 from quizer.presentation.bot.routers.menu import Menu
 
 
