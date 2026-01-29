@@ -25,7 +25,7 @@ class SQLQuestionRepository(QuestionRepository):
             WHERE id = %s
             ORDER BY questions_options.position
             """,
-            (question_id,),
+            (str(question_id),),
         )
         rows = await self.session.fetchall()
 
@@ -55,7 +55,7 @@ class SQLQuestionRepository(QuestionRepository):
             WHERE questions.survey_id = %s
             ORDER BY questions.id, questions_options.position
             """,
-            (survey_id,),
+            (str(survey_id),),
         )
         rows = await self.session.fetchall()
         if not rows:
@@ -87,7 +87,7 @@ class SQLQuestionRepository(QuestionRepository):
     async def add(self, question: Question):
         await self.session.execute(
             """INSERT INTO questions (id, name, survey_id) VALUES (%s, %s, %s)""",
-            (question.id, question.name, question.survey),
+            (str(question.id), question.name, str(question.survey)),
         )
         if question.options:
             await self.session.executemany(
@@ -96,7 +96,7 @@ class SQLQuestionRepository(QuestionRepository):
                 VALUES (%s, %s, %s)
                 """,
                 [
-                    (option, question.id, position)
+                    (option, str(question.id), position)
                     for position, option in enumerate(question.options)
                 ],
             )
@@ -105,25 +105,25 @@ class SQLQuestionRepository(QuestionRepository):
     async def delete(self, question_id: UUID) -> None:
         await self.session.execute(
             "DELETE FROM questions_answers WHERE question_id = %s",
-            (question_id,),
+            (str(question_id),),
         )
         await self.session.execute(
             "DELETE FROM questions_options WHERE question_id = %s",
-            (question_id,),
+            (str(question_id),),
         )
         await self.session.execute(
             "DELETE FROM questions WHERE id = %s",
-            (question_id,),
+            (str(question_id),),
         )
 
     async def update(self, question: Question) -> None:
         await self.session.execute(
             "UPDATE questions SET name = %s WHERE id = %s",
-            (question.name, question.id),
+            (question.name, str(question.id)),
         )
         await self.session.execute(
             "DELETE FROM questions_options WHERE question_id = %s",
-            (question.id,),
+            (str(question.id),),
         )
         if question.options:
             await self.session.executemany(
@@ -132,7 +132,7 @@ class SQLQuestionRepository(QuestionRepository):
                 VALUES (%s, %s, %s)
                 """,
                 [
-                    (option, question.id, position)
+                    (option, str(question.id), position)
                     for position, option in enumerate(question.options)
                 ],
             )
